@@ -9,8 +9,8 @@ stats for small office games. It is initially designed to keep track of
 
 This branch contains a rewrite of the Java+Wicket+MySQL implementation in
 [frankbille/ScoreBoard], into a [Google App Engine][gae] application, using
-[Go language][golang] on the backend, to provide data to the frontend, through
-a REST api. On the frontend [AngularJS][angularjs] is used, so most of the user
+[Go language][golang] on the backend, to provide data to the front-end, through
+a REST api. On the front-end [AngularJS][angularjs] is used, so most of the user
 interface is rendered in the browser, to minimize the hit on the server.
 
 
@@ -40,7 +40,7 @@ A third criteria quickly popped up, which was that new App Engine instances shou
 start *fast*. With `Java` and `Python`, a cold boot is actually very slow, so the first
 request from a user will take 10-30 seconds, depending on how much needing to be
 done on startup. `Go` on the other hand, is a fully compiled binary, so a new instance
-is avaliable in <500ms (I haven't seen it so slow yet, normally arund 50-100ms).
+is available in <500ms (I haven't seen it so slow yet, normally around 50-100ms).
 
 So by choosing `Go`, I can deliver a page with data, within a second even if no
 instances is running. This is pretty amazing and is worth a try-out. I say this
