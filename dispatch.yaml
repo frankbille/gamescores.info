@@ -1,0 +1,14 @@
+application: gamescores-info
+
+dispatch:
+  - url: "gamescores.info/*"
+    module: default
+
+  - url: "gamescores.info/api/*"
+    module: default-api
+
+  - url: "*.gamescores.info/*"
+    module: context-client
+
+  - url: "*.gamescores.info/api/*"
+    module: context-api

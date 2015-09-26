@@ -48,6 +48,7 @@ because I haven't decided 100% that I will use Go. It is a newer language, with
 syntax similar to `C` and with very few mature frameworks compared to `Java` or
 `Python`.
 
+
 ### How to develop on the code?
 
 This is still new technologies for me, so I haven't figured out what the best
@@ -55,6 +56,21 @@ stack is to develop this. I basically use a text editor ([Atom][atom]
 in this case) to edit the `JavaScript` and `Go` files, and then run the Google
 App Engine development server to build/host the files, so I can continuously
 develop and test in a browser, without having to restart all the time.
+
+
+#### Code structure
+
+The code is divided into 4 app engine modules:
+
+* [context-api](context-api)
+  * The REST api for each created game scoreboard.
+* [context-client](context-client)
+  * The Angular client for each created game scoreboard.
+* [default-api](default-api)
+  * The REST api for the default web page, where people f.ex. can create new
+    game scoreboards.
+* [default](default-client)
+  * The Angular client for the default web page.
 
 
 ## Todo
