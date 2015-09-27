@@ -6,6 +6,3 @@ dispatch:
 
   - url: "*.gamescores.info/*"
     module: context
-
-  - url: "*/ctx/*"
-    module: context
