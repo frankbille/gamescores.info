@@ -62,15 +62,15 @@ develop and test in a browser, without having to restart all the time.
 
 The code is divided into 4 app engine modules:
 
-* [context-api](context-api)
-  * The REST api for each created game scoreboard.
-* [context-client](context-client)
-  * The Angular client for each created game scoreboard.
-* [default-api](default-api)
-  * The REST api for the default web page, where people f.ex. can create new
-    game scoreboards.
-* [default](default-client)
-  * The Angular client for the default web page.
+* [context](context)
+  * The module containing front-end and API for each created game scoreboard.
+    It creates a [namespace][namespace] for each game scoreboard, based on the
+    subdomain. So if the url is `http://company.gamescores.info`, then the
+    namespace will be "company".
+* [default](default)
+  * The module containing front-end and API for the web page, where new game
+    scoreboards can be created. It is the module that is activated when hitting
+    `http://gamescores.info`.
 
 
 ## Todo
@@ -92,3 +92,4 @@ Licensed under the [GNU General Public License, Version 3.0][license]
 [goinstalldoc]: http://golang.org/doc/install
 [angularjs]: http://angularjs.org
 [atom]: http://atom.io
+[namespace]: https://cloud.google.com/appengine/docs/go/reference#Namespace
