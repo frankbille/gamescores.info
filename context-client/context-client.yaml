@@ -1,8 +1,0 @@
-application: gamescores-info
-module: context-client
-api_version: go1
-runtime: go
-
-handlers:
-- url: /.*
-  script: _go_app

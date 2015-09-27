@@ -1,8 +1,12 @@
 application: gamescores-info
-module: default-api
+module: default
 api_version: go1
 runtime: go
 
 handlers:
 - url: /.*
+  static_files: index.html
+  upload: index.html
+
+- url: /api/.*
   script: _go_app

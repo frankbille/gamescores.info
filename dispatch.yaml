@@ -4,11 +4,8 @@ dispatch:
   - url: "gamescores.info/*"
     module: default
 
-  - url: "gamescores.info/api/*"
-    module: default-api
-
   - url: "*.gamescores.info/*"
-    module: context-client
+    module: context
 
-  - url: "*.gamescores.info/api/*"
-    module: context-api
+  - url: "*/ctx/*"
+    module: context
