@@ -13,3 +13,4 @@ handlers:
 
 env_variables:
   GIN_MODE: "release"
+  PRODUCTION_DOMAIN: "gamescores.info"
