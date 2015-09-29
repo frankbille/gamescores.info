@@ -24,9 +24,12 @@ func init() {
 	api.GET("/me", getCurrentUser)
 	api.GET("/login", startLoginProcess)
 
-	api.GET("/", func(c *gin.Context) {
-		c.String(200, "HELLO WORLD")
-	})
+	// Player endpoints
+	players := api.Group("/players")
+	players.GET("", getPlayers)
+	players.POST("", createPlayer)
+	players.GET("/:playerId", getPlayer)
+	players.POST("/:playerId", updatePlayer)
 
 	http.Handle("/", r)
 }
