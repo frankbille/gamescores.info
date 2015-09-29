@@ -8,10 +8,11 @@ stats for small office games. It is initially designed to keep track of
 ## Google App Engine Edition
 
 This branch contains a rewrite of the Java+Wicket+MySQL implementation in
-[frankbille/ScoreBoard], into a [Google App Engine][gae] application, using
-[Go language][golang] on the backend, to provide data to the front-end, through
-a REST api. On the front-end [AngularJS][angularjs] is used, so most of the user
-interface is rendered in the browser, to minimize the hit on the server.
+[frankbille/ScoreBoard](https://github.com/frankbille/ScoreBoard), into a
+[Google App Engine][gae] application, using [Go language][golang] on the backend,
+to provide data to the front-end, through a REST api. On the front-end
+[AngularJS][angularjs] is used, so most of the user interface is rendered in the
+browser, to minimize the hit on the server.
 
 
 ### Why a rewrite?
