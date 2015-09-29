@@ -2,7 +2,9 @@ package context
 
 import (
 	"fmt"
+	gin "github.com/gamescores/gin"
 	"math"
+	"strconv"
 )
 
 func addPaginationLinks(halResource HalResource, baseURL string, currentPage, recordsPerPage, totalRecordCount int) {
@@ -39,4 +41,19 @@ func generatePaginationURL(baseURL string, page int) string {
 
 func getStartRecord(currentPage, recordsPerPage int) int {
 	return (currentPage - 1) * recordsPerPage
+}
+
+func getCurrentPage(c *gin.Context) int {
+	pageString := c.Request.URL.Query().Get("page")
+
+	var currentPage = 1
+
+	pageValue, err := strconv.ParseInt(pageString, 10, 32)
+	if err == nil {
+		currentPage = int(pageValue)
+	}
+	if currentPage < 1 {
+		currentPage = 1
+	}
+	return currentPage
 }

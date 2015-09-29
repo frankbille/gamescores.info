@@ -94,21 +94,6 @@ func doSavePlayer(player Player, c *gin.Context) {
 }
 
 // Private helper methods
-func getCurrentPage(c *gin.Context) int {
-	pageString := c.Request.URL.Query().Get("page")
-
-	var currentPage = 1
-
-	pageValue, err := strconv.ParseInt(pageString, 10, 32)
-	if err == nil {
-		currentPage = int(pageValue)
-	}
-	if currentPage < 1 {
-		currentPage = 1
-	}
-	return currentPage
-}
-
 func getPlayerIDFromURL(c *gin.Context) int64 {
 	playerIDString := c.Params.ByName("playerId")
 	playerID, err := strconv.ParseInt(playerIDString, 10, 64)
