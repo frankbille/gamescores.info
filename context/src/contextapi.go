@@ -31,6 +31,13 @@ func init() {
 	players.GET("/:playerId", getPlayer)
 	players.POST("/:playerId", updatePlayer)
 
+	// League endpoints
+	leagues := api.Group("/leagues")
+	leagues.GET("", getLeagues)
+	leagues.POST("", createLeague)
+	leagues.GET("/:leagueId", getLeague)
+	leagues.POST("/:leagueId", updateLeague)
+
 	http.Handle("/", r)
 }
 
