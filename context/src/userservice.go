@@ -9,6 +9,37 @@ const (
 	userKey = "user"
 )
 
+type userService struct {
+}
+
+func (us userService) CreateRoutes(parentRoute *gin.RouterGroup) {
+	parentRoute.GET("/me", us.getCurrentUser)
+	parentRoute.GET("/login", us.startLoginProcess)
+}
+
+func (us userService) getCurrentUser(c *gin.Context) {
+	user := getCurrentUserFromGinContext(c)
+	c.JSON(200, user)
+}
+
+func (us userService) startLoginProcess(c *gin.Context) {
+	gaeCtx := getGaeContext(c)
+
+	loginURL, err := appengineuser.LoginURL(gaeCtx, "")
+
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
+
+	c.Redirect(304, loginURL)
+}
+
+func getCurrentUserFromGinContext(c *gin.Context) *User {
+	usr := c.MustGet(userKey)
+	return usr.(*User)
+}
+
 func resolveUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		gaeCtx := getGaeContext(c)
@@ -50,27 +81,4 @@ func resolveUser() gin.HandlerFunc {
 
 		c.Set(userKey, user)
 	}
-}
-
-func getCurrentUser(c *gin.Context) {
-	user := getCurrentUserFromGinContext(c)
-	c.JSON(200, user)
-}
-
-func startLoginProcess(c *gin.Context) {
-	gaeCtx := getGaeContext(c)
-
-	loginURL, err := appengineuser.LoginURL(gaeCtx, "")
-
-	if err != nil {
-		c.AbortWithError(500, err)
-		return
-	}
-
-	c.Redirect(304, loginURL)
-}
-
-func getCurrentUserFromGinContext(c *gin.Context) *User {
-	usr := c.MustGet(userKey)
-	return usr.(*User)
 }

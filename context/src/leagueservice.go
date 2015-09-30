@@ -6,7 +6,18 @@ import (
 	"strconv"
 )
 
-func getLeagues(c *gin.Context) {
+type leagueService struct {
+}
+
+func (ls leagueService) CreateRoutes(parentRoute *gin.RouterGroup) {
+	leagues := parentRoute.Group("/leagues")
+	leagues.GET("", ls.getLeagues)
+	leagues.POST("", ls.createLeague)
+	leagues.GET("/:leagueId", ls.getLeague)
+	leagues.POST("/:leagueId", ls.updateLeague)
+}
+
+func (ls leagueService) getLeagues(c *gin.Context) {
 	var currentPage = getCurrentPage(c)
 	var recordsPerPage = 50
 	var start = getStartRecord(currentPage, recordsPerPage)
@@ -38,7 +49,7 @@ func getLeagues(c *gin.Context) {
 	c.JSON(200, leagues)
 }
 
-func getLeague(c *gin.Context) {
+func (ls leagueService) getLeague(c *gin.Context) {
 	leagueID := getLeagueIDFromURL(c)
 
 	if leagueID <= 0 {
@@ -60,7 +71,7 @@ func getLeague(c *gin.Context) {
 	c.JSON(200, league)
 }
 
-func createLeague(c *gin.Context) {
+func (ls leagueService) createLeague(c *gin.Context) {
 	var league League
 
 	c.Bind(&league)
@@ -68,18 +79,18 @@ func createLeague(c *gin.Context) {
 	league.ID = 0
 	league.Active = true
 
-	doSaveLeague(league, c)
+	ls.doSaveLeague(league, c)
 }
 
-func updateLeague(c *gin.Context) {
+func (ls leagueService) updateLeague(c *gin.Context) {
 	var league League
 
 	c.Bind(&league)
 
-	doSaveLeague(league, c)
+	ls.doSaveLeague(league, c)
 }
 
-func doSaveLeague(league League, c *gin.Context) {
+func (ls leagueService) doSaveLeague(league League, c *gin.Context) {
 	dao := createDao(getGaeContext(c))
 	leagueDao := leagueDao{dao}
 

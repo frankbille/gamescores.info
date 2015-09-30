@@ -6,7 +6,18 @@ import (
 	"strconv"
 )
 
-func getPlayers(c *gin.Context) {
+type playerService struct {
+}
+
+func (ps playerService) CreateRoutes(parentRoute *gin.RouterGroup) {
+	players := parentRoute.Group("/players")
+	players.GET("", ps.getPlayers)
+	players.POST("", ps.createPlayer)
+	players.GET("/:playerId", ps.getPlayer)
+	players.POST("/:playerId", ps.updatePlayer)
+}
+
+func (ps playerService) getPlayers(c *gin.Context) {
 	var currentPage = getCurrentPage(c)
 	var recordsPerPage = 50
 	var start = getStartRecord(currentPage, recordsPerPage)
@@ -38,7 +49,7 @@ func getPlayers(c *gin.Context) {
 	c.JSON(200, players)
 }
 
-func getPlayer(c *gin.Context) {
+func (ps playerService) getPlayer(c *gin.Context) {
 	playerID := getPlayerIDFromURL(c)
 
 	if playerID <= 0 {
@@ -60,7 +71,7 @@ func getPlayer(c *gin.Context) {
 	c.JSON(200, player)
 }
 
-func createPlayer(c *gin.Context) {
+func (ps playerService) createPlayer(c *gin.Context) {
 	var player Player
 
 	c.Bind(&player)
@@ -68,18 +79,18 @@ func createPlayer(c *gin.Context) {
 	player.ID = 0
 	player.Active = true
 
-	doSavePlayer(player, c)
+	ps.doSavePlayer(player, c)
 }
 
-func updatePlayer(c *gin.Context) {
+func (ps playerService) updatePlayer(c *gin.Context) {
 	var player Player
 
 	c.Bind(&player)
 
-	doSavePlayer(player, c)
+	ps.doSavePlayer(player, c)
 }
 
-func doSavePlayer(player Player, c *gin.Context) {
+func (ps playerService) doSavePlayer(player Player, c *gin.Context) {
 	dao := createDao(getGaeContext(c))
 	playerDao := playerDao{dao}
 

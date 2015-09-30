@@ -12,6 +12,10 @@ const (
 	gaeCtxKey = "GaeCtxKey"
 )
 
+type restService interface {
+	CreateRoutes(parentRoute *gin.RouterGroup)
+}
+
 func init() {
 	r := gin.New()
 
@@ -20,23 +24,17 @@ func init() {
 
 	api := r.Group("/api")
 
-	// User endpoints
-	api.GET("/me", getCurrentUser)
-	api.GET("/login", startLoginProcess)
+	// Create list of services used
+	services := []restService{
+		userService{},
+		playerService{},
+		leagueService{},
+	}
 
-	// Player endpoints
-	players := api.Group("/players")
-	players.GET("", getPlayers)
-	players.POST("", createPlayer)
-	players.GET("/:playerId", getPlayer)
-	players.POST("/:playerId", updatePlayer)
-
-	// League endpoints
-	leagues := api.Group("/leagues")
-	leagues.GET("", getLeagues)
-	leagues.POST("", createLeague)
-	leagues.GET("/:leagueId", getLeague)
-	leagues.POST("/:leagueId", updateLeague)
+	// Process the services
+	for _, service := range services {
+		service.CreateRoutes(api)
+	}
 
 	http.Handle("/", r)
 }
