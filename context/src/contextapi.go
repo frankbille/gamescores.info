@@ -26,9 +26,9 @@ func init() {
 
 	// Create list of services used
 	services := []restService{
-		userService{},
-		playerService{},
-		leagueService{},
+		createUserService(),
+		createPlayerService(),
+		createLeagueService(),
 	}
 
 	// Process the services

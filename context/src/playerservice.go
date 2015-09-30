@@ -9,6 +9,10 @@ import (
 type playerService struct {
 }
 
+func createPlayerService() playerService {
+	return playerService{}
+}
+
 func (ps playerService) CreateRoutes(parentRoute *gin.RouterGroup) {
 	players := parentRoute.Group("/players")
 	players.GET("", ps.getPlayers)
@@ -37,7 +41,7 @@ func (ps playerService) getPlayers(c *gin.Context) {
 	}
 
 	for index := range playerArray {
-		addPlayerLinks(&playerArray[index])
+		addPlayerLinks(&playerArray[index], c)
 	}
 
 	players := &Players{
@@ -45,6 +49,9 @@ func (ps playerService) getPlayers(c *gin.Context) {
 	}
 
 	addPaginationLinks(players, "/api/players", currentPage, recordsPerPage, totalPlayerCount)
+	if isAuthenticated(c) {
+		players.AddLink(relCreate, "/api/players")
+	}
 
 	c.JSON(200, players)
 }
@@ -67,7 +74,7 @@ func (ps playerService) getPlayer(c *gin.Context) {
 		return
 	}
 
-	addPlayerLinks(player)
+	addPlayerLinks(player, c)
 	c.JSON(200, player)
 }
 
@@ -100,7 +107,7 @@ func (ps playerService) doSavePlayer(player Player, c *gin.Context) {
 		c.AbortWithError(500, err)
 	}
 
-	addPlayerLinks(savedPlayer)
+	addPlayerLinks(savedPlayer, c)
 	c.JSON(200, savedPlayer)
 }
 
@@ -114,8 +121,12 @@ func getPlayerIDFromURL(c *gin.Context) int64 {
 	return playerID
 }
 
-func addPlayerLinks(player *Player) {
+func addPlayerLinks(player *Player, c *gin.Context) {
 	selfURL := fmt.Sprintf("/api/players/%d", player.ID)
 
 	player.AddLink(relSelf, selfURL)
+
+	if isAuthenticated(c) {
+		player.AddLink(relUpdate, selfURL)
+	}
 }

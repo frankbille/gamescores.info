@@ -9,6 +9,10 @@ import (
 type leagueService struct {
 }
 
+func createLeagueService() leagueService {
+	return leagueService{}
+}
+
 func (ls leagueService) CreateRoutes(parentRoute *gin.RouterGroup) {
 	leagues := parentRoute.Group("/leagues")
 	leagues.GET("", ls.getLeagues)
@@ -37,7 +41,7 @@ func (ls leagueService) getLeagues(c *gin.Context) {
 	}
 
 	for index := range leagueArray {
-		addLeagueLinks(&leagueArray[index])
+		addLeagueLinks(&leagueArray[index], c)
 	}
 
 	leagues := &Leagues{
@@ -45,6 +49,10 @@ func (ls leagueService) getLeagues(c *gin.Context) {
 	}
 
 	addPaginationLinks(leagues, "/api/leagues", currentPage, recordsPerPage, totalLeagueCount)
+
+	if isAuthenticated(c) {
+		leagues.AddLink(relCreate, "/api/leagues")
+	}
 
 	c.JSON(200, leagues)
 }
@@ -67,7 +75,7 @@ func (ls leagueService) getLeague(c *gin.Context) {
 		return
 	}
 
-	addLeagueLinks(league)
+	addLeagueLinks(league, c)
 	c.JSON(200, league)
 }
 
@@ -100,7 +108,7 @@ func (ls leagueService) doSaveLeague(league League, c *gin.Context) {
 		c.AbortWithError(500, err)
 	}
 
-	addLeagueLinks(savedLeague)
+	addLeagueLinks(savedLeague, c)
 	c.JSON(200, savedLeague)
 }
 
@@ -114,8 +122,12 @@ func getLeagueIDFromURL(c *gin.Context) int64 {
 	return leagueID
 }
 
-func addLeagueLinks(league *League) {
+func addLeagueLinks(league *League, c *gin.Context) {
 	selfURL := fmt.Sprintf("/api/leagues/%d", league.ID)
 
 	league.AddLink(relSelf, selfURL)
+
+	if isAuthenticated(c) {
+		league.AddLink(relUpdate, selfURL)
+	}
 }

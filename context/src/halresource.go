@@ -2,6 +2,7 @@ package context
 
 const (
 	relSelf   RelType = "self"
+	relCreate RelType = "create"
 	relUpdate RelType = "update"
 	relDelete RelType = "delete"
 	relNext   RelType = "next"

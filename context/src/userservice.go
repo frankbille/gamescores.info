@@ -12,6 +12,10 @@ const (
 type userService struct {
 }
 
+func createUserService() userService {
+	return userService{}
+}
+
 func (us userService) CreateRoutes(parentRoute *gin.RouterGroup) {
 	parentRoute.GET("/me", us.getCurrentUser)
 	parentRoute.GET("/login", us.startLoginProcess)
@@ -85,12 +89,15 @@ func resolveUser() gin.HandlerFunc {
 
 func mustBeAuthenticated() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		user := getCurrentUserFromGinContext(c)
-
-		if user.LoggedIn {
+		if isAuthenticated(c) {
 			c.Next()
 		} else {
 			c.AbortWithStatus(401)
 		}
 	}
+}
+
+func isAuthenticated(c *gin.Context) bool {
+	user := getCurrentUserFromGinContext(c)
+	return user.LoggedIn
 }
