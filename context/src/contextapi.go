@@ -54,6 +54,7 @@ func gaeContext() gin.HandlerFunc {
 		}
 
 		if namespace != "" {
+			gaeCtx.Debugf("Using namespace: \"%s\"", namespace)
 			nameSpacedGaeCtx, err := appengine.Namespace(gaeCtx, namespace)
 			if err != nil {
 				c.AbortWithError(500, err)
