@@ -12,9 +12,9 @@ type playerService struct {
 func (ps playerService) CreateRoutes(parentRoute *gin.RouterGroup) {
 	players := parentRoute.Group("/players")
 	players.GET("", ps.getPlayers)
-	players.POST("", ps.createPlayer)
+	players.POST("", mustBeAuthenticated(), ps.createPlayer)
 	players.GET("/:playerId", ps.getPlayer)
-	players.POST("/:playerId", ps.updatePlayer)
+	players.POST("/:playerId", mustBeAuthenticated(), ps.updatePlayer)
 }
 
 func (ps playerService) getPlayers(c *gin.Context) {

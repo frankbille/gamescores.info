@@ -82,3 +82,15 @@ func resolveUser() gin.HandlerFunc {
 		c.Set(userKey, user)
 	}
 }
+
+func mustBeAuthenticated() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		user := getCurrentUserFromGinContext(c)
+
+		if user.LoggedIn {
+			c.Next()
+		} else {
+			c.AbortWithStatus(401)
+		}
+	}
+}

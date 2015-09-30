@@ -12,9 +12,9 @@ type leagueService struct {
 func (ls leagueService) CreateRoutes(parentRoute *gin.RouterGroup) {
 	leagues := parentRoute.Group("/leagues")
 	leagues.GET("", ls.getLeagues)
-	leagues.POST("", ls.createLeague)
+	leagues.POST("", mustBeAuthenticated(), ls.createLeague)
 	leagues.GET("/:leagueId", ls.getLeague)
-	leagues.POST("/:leagueId", ls.updateLeague)
+	leagues.POST("/:leagueId", mustBeAuthenticated(), ls.updateLeague)
 }
 
 func (ls leagueService) getLeagues(c *gin.Context) {
