@@ -1,8 +1,8 @@
 application: gamescores-info
 
 dispatch:
-  - url: "gamescores.info/*"
-    module: default
-
   - url: "*.gamescores.info/*"
     module: context
+
+  - url: "gamescores.info/*"
+    module: default

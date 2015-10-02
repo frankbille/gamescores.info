@@ -26,8 +26,7 @@ func (ps playerService) getPlayers(c *gin.Context) {
 	var recordsPerPage = 50
 	var start = getStartRecord(currentPage, recordsPerPage)
 
-	dao := createDao(getGaeContext(c))
-	playerDao := playerDao{dao}
+	playerDao := createPlayerDao(c)
 
 	playerArray, totalPlayerCount, err := playerDao.getPlayers(start, recordsPerPage)
 
@@ -64,8 +63,7 @@ func (ps playerService) getPlayer(c *gin.Context) {
 		return
 	}
 
-	dao := createDao(getGaeContext(c))
-	playerDao := playerDao{dao}
+	playerDao := createPlayerDao(c)
 
 	player, err := playerDao.getPlayer(playerID)
 
@@ -98,8 +96,7 @@ func (ps playerService) updatePlayer(c *gin.Context) {
 }
 
 func (ps playerService) doSavePlayer(player Player, c *gin.Context) {
-	dao := createDao(getGaeContext(c))
-	playerDao := playerDao{dao}
+	playerDao := createPlayerDao(c)
 
 	savedPlayer, err := playerDao.savePlayer(player)
 

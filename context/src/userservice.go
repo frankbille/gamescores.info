@@ -97,7 +97,25 @@ func mustBeAuthenticated() gin.HandlerFunc {
 	}
 }
 
+func mustBeAdmin() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if isAdmin(c) {
+			c.Next()
+		} else {
+			c.AbortWithStatus(401)
+		}
+	}
+}
+
 func isAuthenticated(c *gin.Context) bool {
 	user := getCurrentUserFromGinContext(c)
 	return user.LoggedIn
+}
+
+func isAdmin(c *gin.Context) bool {
+	if isAuthenticated(c) {
+		user := getCurrentUserFromGinContext(c)
+		return user.Role == Admin
+	}
+	return false
 }

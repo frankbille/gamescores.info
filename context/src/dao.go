@@ -61,6 +61,29 @@ func (dao *dao) getList(entityType string, start, limit int, dataObjects interfa
 	return count, nil
 }
 
+func (dao *dao) getListForAncestor(entityType string, start, limit int, ancestor *datastore.Key, dataObjects interface{}) (int, error) {
+	q := datastore.NewQuery(entityType).
+		Ancestor(ancestor).
+		Offset(start).
+		Limit(limit)
+
+	_, err := q.GetAll(dao.Context, dataObjects)
+
+	if err != nil {
+		return 0, err
+	}
+
+	count, err := datastore.NewQuery(entityType).
+		Ancestor(ancestor).
+		Count(dao.Context)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (dao *dao) getByFilter(entityType, propertyName, propertyValue string, dataObjects interface{}) error {
 	cacheKey := dao.createCacheKey(entityType, propertyName, propertyValue)
 

@@ -16,10 +16,11 @@ func createGameDao(c *gin.Context) gameDao {
 	return gameDao{dao}
 }
 
-func (dao *gameDao) getGames(start, limit int) ([]Game, int, error) {
+func (dao *gameDao) getGames(start, limit int, leagueID int64) ([]Game, int, error) {
 	var games []Game
 
-	count, err := dao.getList(entityGame, start, limit, &games)
+	leagueKey := datastore.NewKey(dao.Context, entityLeague, "", leagueID, nil)
+	count, err := dao.getListForAncestor(entityGame, start, limit, leagueKey, &games)
 
 	return games, count, err
 }
@@ -42,7 +43,7 @@ func (dao *gameDao) saveGame(game Game) (*Game, error) {
 
 	leagueKey := datastore.NewKey(dao.Context, entityLeague, "", game.LeagueID, nil)
 	game.League = leagueKey
-	key := datastore.NewKey(dao.Context, entityGame, "", game.ID, nil)
+	key := datastore.NewKey(dao.Context, entityGame, "", game.ID, leagueKey)
 
 	g, err := dao.save(key, &game)
 

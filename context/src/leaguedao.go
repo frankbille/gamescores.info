@@ -2,12 +2,18 @@ package context
 
 import (
 	datastore "appengine/datastore"
+	gin "github.com/gamescores/gin"
 )
 
 const entityLeague string = "League"
 
 type leagueDao struct {
 	dao
+}
+
+func createLeagueDao(c *gin.Context) leagueDao {
+	dao := createDao(getGaeContext(c))
+	return leagueDao{dao}
 }
 
 func (dao *leagueDao) getLeagues(start, limit int) ([]League, int, error) {

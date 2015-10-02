@@ -26,8 +26,7 @@ func (ls leagueService) getLeagues(c *gin.Context) {
 	var recordsPerPage = 50
 	var start = getStartRecord(currentPage, recordsPerPage)
 
-	dao := createDao(getGaeContext(c))
-	leagueDao := leagueDao{dao}
+	leagueDao := createLeagueDao(c)
 
 	leagueArray, totalLeagueCount, err := leagueDao.getLeagues(start, recordsPerPage)
 
@@ -65,8 +64,7 @@ func (ls leagueService) getLeague(c *gin.Context) {
 		return
 	}
 
-	dao := createDao(getGaeContext(c))
-	leagueDao := leagueDao{dao}
+	leagueDao := createLeagueDao(c)
 
 	league, err := leagueDao.getLeague(leagueID)
 
@@ -99,8 +97,7 @@ func (ls leagueService) updateLeague(c *gin.Context) {
 }
 
 func (ls leagueService) doSaveLeague(league League, c *gin.Context) {
-	dao := createDao(getGaeContext(c))
-	leagueDao := leagueDao{dao}
+	leagueDao := createLeagueDao(c)
 
 	savedLeague, err := leagueDao.saveLeague(league)
 

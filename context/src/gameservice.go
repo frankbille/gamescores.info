@@ -39,7 +39,7 @@ func (gs gameService) getGames(c *gin.Context) {
 
 	gameDao := createGameDao(c)
 
-	gameArray, totalGameCount, err := gameDao.getGames(start, recordsPerPage)
+	gameArray, totalGameCount, err := gameDao.getGames(start, recordsPerPage, leagueID)
 
 	if err != nil {
 		c.AbortWithError(500, err)

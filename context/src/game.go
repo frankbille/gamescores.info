@@ -20,7 +20,7 @@ type Game struct {
 // GameTeam represents one of the teams that played and the score they got
 type GameTeam struct {
 	Players []int64 `json:"players"`
-	Score   int32   `json:"score"`
+	Score   int     `json:"score"`
 }
 
 // Games holds a list of games as well as hyperlinks
