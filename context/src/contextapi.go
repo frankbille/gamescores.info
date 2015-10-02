@@ -29,6 +29,7 @@ func init() {
 		createUserService(),
 		createPlayerService(),
 		createLeagueService(),
+		createGameService(),
 	}
 
 	// Process the services
