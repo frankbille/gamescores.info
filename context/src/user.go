@@ -19,10 +19,10 @@ type User struct {
 	DefaultHalResource
 	// The id from the appengine.user.User type
 	UserID        string   `json:"-"`
-	LoggedIn      bool     `json:"logged-in" datastore:"-"`
+	LoggedIn      bool     `json:"loggedIn" datastore:"-"`
 	Name          string   `json:"name,omitempty"`
-	Email         string   `json:"-"`
-	DefaultLeague int64    `json:"default-league,omitempty"`
-	ClaimedPlayer int64    `json:"claimed-player,omitempty"`
+	Email         string   `json:"email"`
+	DefaultLeague int64    `json:"defaultLeague,omitempty"`
+	ClaimedPlayer int64    `json:"claimedPlayer,omitempty"`
 	Role          UserRole `json:"role"`
 }

@@ -7,24 +7,27 @@ handlers:
 - url: /api/.*
   script: _go_app
 
+- url: /bower_components
+  static_dir: bower_components
+
 - url: /scripts
-  static_dir: dist/scripts
+  static_dir: client/scripts
 
 - url: /styles
-  static_dir: dist/styles
+  static_dir: client/styles
 
 - url: /images
-  static_dir: dist/images
+  static_dir: client/images
 
 - url: /.*
-  static_files: dist/index.html
-  upload: dist/index\.html
+  static_files: client/index.html
+  upload: client/index\.html
 
 skip_files:
 - node_modules
 - bower_components
 - .tmp
-- client
+- dist
 
 env_variables:
   GIN_MODE: "release"

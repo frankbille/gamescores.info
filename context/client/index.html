@@ -1,0 +1,49 @@
+<html lang="en" ng-app="GameScoresApp">
+  <head>
+    <style>
+    [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+      display: none !important;
+    }
+    </style>
+    <!-- build:css /styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="../bower_components/angular-material/angular-material.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
+    <!-- build:css /styles/app.css -->
+    <link rel="stylesheet" href="styles/app.css" />
+    <!-- endbuild -->
+    <meta name="viewport" content="initial-scale=1" />
+  </head>
+  <body ng-cloak>
+    <md-toolbar ng-controller="MenuCtrl">
+      <div class="md-toolbar-tools">
+        <h2>
+          <span>Game Scores</span>
+        </h2>
+        <span flex></span>
+        <md-button ng-hide="userLoading || user.loggedIn" ng-href="{{user._links.login.href}}">Login</md-button>
+        <md-button ng-show="user.loggedIn" ng-href="{{user._links.logout.href}}">Logout</md-button>
+        <md-button ng-show="user.loggedIn" class="md-icon-button"><img gravatar-src="user.email" gravatar-size="30"></md-button>
+      </div>
+    </md-toolbar>
+
+
+    <!-- build:js /scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="../bower_components/angular/angular.js"></script>
+    <script src="../bower_components/angular-animate/angular-animate.js"></script>
+    <script src="../bower_components/angular-aria/angular-aria.js"></script>
+    <script src="../bower_components/angular-material/angular-material.js"></script>
+    <script src="../bower_components/angular-gravatar/build/angular-gravatar.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:js /scripts/app.js -->
+    <script src="scripts/app.js"></script>
+    <script src="scripts/config/material.js"></script>
+    <script src="scripts/services/user.service.js"></script>
+    <script src="scripts/menu/menu.ctrl.js"></script>
+    <!-- endbuild -->
+  </body>
+</html>

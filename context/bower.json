@@ -1,0 +1,8 @@
+{
+  "name": "gamescore.info",
+  "version": "2.0.0",
+  "dependencies": {
+    "angular-material": "~0.11.2",
+    "angular-gravatar": "~0.4.1"
+  }
+}

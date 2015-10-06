@@ -36,7 +36,7 @@ func (us userService) startLoginProcess(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(304, loginURL)
+	c.Redirect(302, loginURL)
 }
 
 func getCurrentUserFromGinContext(c *gin.Context) *User {
