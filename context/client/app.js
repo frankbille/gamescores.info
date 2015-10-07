@@ -1,4 +1,5 @@
 angular.module('GameScoresApp', [
+  'ui.router',
   'ngMaterial',
   'ui.gravatar'
 ]).config(function($locationProvider) {

@@ -10,14 +10,27 @@ handlers:
 - url: /bower_components
   static_dir: bower_components
 
-- url: /scripts
-  static_dir: client/scripts
+- url: /config
+  static_dir: client/config
+
+- url: /games
+  static_dir: client/games
+
+- url: /menu
+  static_dir: client/menu
+
+- url: /services
+  static_dir: client/services
 
 - url: /styles
   static_dir: client/styles
 
 - url: /images
   static_dir: client/images
+
+- url: /app\.js
+  static_files: client/app.js
+  upload: client/app\.js
 
 - url: /.*
   static_files: client/index.html

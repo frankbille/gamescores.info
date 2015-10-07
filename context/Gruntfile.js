@@ -52,7 +52,7 @@ module.exports = function(grunt) {
     rev: {
       files: {
         src: [
-          '<%= cfg.dist %>/scripts/{,*/}*.js',
+          '<%= cfg.dist %>/{,*/}*.js',
           '<%= cfg.dist %>/styles/{,*/}*.css',
           '<%= cfg.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
           '<%= cfg.dist %>/styles/fonts/*'
@@ -119,7 +119,7 @@ module.exports = function(grunt) {
         files: [{
           expand: true,
           cwd: '<%= cfg.app %>',
-          src: ['views/{,*/}*.html'],
+          src: ['{,*/}*.html'],
           dest: '.tmp'
         }]
       }
@@ -146,7 +146,7 @@ module.exports = function(grunt) {
           prefix: '/'
         },
         cwd: '.tmp',
-        src: 'views/*.html',
+        src: ['{,*/}*.html', '!index.html'],
         dest: '.tmp/templates.js'
       }
     },

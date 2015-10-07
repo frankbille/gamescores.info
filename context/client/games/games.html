@@ -1,0 +1,16 @@
+<md-progress-circular md-mode="indeterminate" ng-hide="gameList"></md-progress-circular>
+
+<md-list>
+  <md-list-item class="md-2-line" ng-repeat="game in gameList.games">
+    <div class="md-list-item-text" layout="column">
+      <h3>
+        <span ng-repeat="player in game.team1.players | orderBy:name">{{player.name}}{{$last ? '' : '/'}}</span>
+        <strong>vs.</strong>
+        <span ng-repeat="player in game.team2.players | orderBy:name">{{player.name}}{{$last ? '' : '/'}}</span>
+        -
+        <strong>{{game.team1.score}}:{{game.team2.score}}</strong>
+      </h3>
+      <h4>{{ game.gameDate.format('LL') }}</h4>
+    </div>
+  </md-list-item>
+</md-list>

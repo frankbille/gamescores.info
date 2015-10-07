@@ -10,11 +10,11 @@ import (
 type Game struct {
 	DefaultHalResource
 	ID       int64          `json:"id"`
-	GameDate time.Time      `json:"game-date"`
+	GameDate time.Time      `json:"gameDate"`
 	Team1    GameTeam       `json:"team1"`
 	Team2    GameTeam       `json:"team2"`
 	League   *datastore.Key `json:"-"`
-	LeagueID int64          `json:"league-id"`
+	LeagueID int64          `json:"leagueId"`
 }
 
 // GameTeam represents one of the teams that played and the score they got

@@ -1,5 +1,6 @@
 <html lang="en" ng-app="GameScoresApp">
   <head>
+    <base href="/">
     <style>
     [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
       display: none !important;
@@ -16,19 +17,30 @@
     <!-- endbuild -->
     <meta name="viewport" content="initial-scale=1" />
   </head>
-  <body ng-cloak>
+  <body ng-cloak layout="column" flex>
     <md-toolbar ng-controller="MenuCtrl">
       <div class="md-toolbar-tools">
         <h2>
           <span>Game Scores</span>
         </h2>
+        <md-menu>
+          <md-button ng-click="$mdOpenMenu($event)">Leagues</md-button>
+          <md-menu-content width="4">
+            <md-menu-item ng-repeat="league in leagueList.leagues">
+              <md-button ui-sref="games({leagueId: league.id})">{{league.name}}</md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
         <span flex></span>
         <md-button ng-hide="userLoading || user.loggedIn" ng-href="{{user._links.login.href}}">Login</md-button>
         <md-button ng-show="user.loggedIn" ng-href="{{user._links.logout.href}}">Logout</md-button>
-        <md-button ng-show="user.loggedIn" class="md-icon-button"><img gravatar-src="user.email" gravatar-size="30"></md-button>
+        <md-button aria-label="Avatar" ng-show="user.loggedIn" class="md-icon-button"><img gravatar-src="user.email" gravatar-size="30"></md-button>
       </div>
     </md-toolbar>
 
+    <md-content flex>
+      <div ui-view></div>
+    </md-content>
 
     <!-- build:js /scripts/vendor.js -->
     <!-- bower:js -->
@@ -37,13 +49,20 @@
     <script src="../bower_components/angular-aria/angular-aria.js"></script>
     <script src="../bower_components/angular-material/angular-material.js"></script>
     <script src="../bower_components/angular-gravatar/build/angular-gravatar.js"></script>
+    <script src="../bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="../bower_components/moment/moment.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:js /scripts/app.js -->
-    <script src="scripts/app.js"></script>
-    <script src="scripts/config/material.js"></script>
-    <script src="scripts/services/user.service.js"></script>
-    <script src="scripts/menu/menu.ctrl.js"></script>
+    <script src="app.js"></script>
+    <script src="config/routes.js"></script>
+    <script src="config/material.js"></script>
+    <script src="services/user.service.js"></script>
+    <script src="services/league.service.js"></script>
+    <script src="services/player.service.js"></script>
+    <script src="services/game.service.js"></script>
+    <script src="menu/menu.ctrl.js"></script>
+    <script src="games/gamelist.ctrl.js"></script>
     <!-- endbuild -->
   </body>
 </html>

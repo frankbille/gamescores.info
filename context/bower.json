@@ -3,6 +3,8 @@
   "version": "2.0.0",
   "dependencies": {
     "angular-material": "~0.11.2",
-    "angular-gravatar": "~0.4.1"
+    "angular-gravatar": "~0.4.1",
+    "angular-ui-router": "~0.2.15",
+    "moment": "~2.10.6"
   }
 }
