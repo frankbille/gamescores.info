@@ -16,7 +16,7 @@ func createUserService() userService {
 	return userService{}
 }
 
-func (us userService) CreateRoutes(parentRoute *gin.RouterGroup) {
+func (us userService) CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gin.RouterGroup) {
 	parentRoute.GET("/me", us.getCurrentUser)
 	parentRoute.GET("/login", us.startLoginProcess)
 }

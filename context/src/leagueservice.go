@@ -13,7 +13,7 @@ func createLeagueService() leagueService {
 	return leagueService{}
 }
 
-func (ls leagueService) CreateRoutes(parentRoute *gin.RouterGroup) {
+func (ls leagueService) CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gin.RouterGroup) {
 	leagues := parentRoute.Group("/leagues")
 	leagues.GET("", ls.getLeagues)
 	leagues.POST("", mustBeAuthenticated(), ls.createLeague)

@@ -1,11 +1,15 @@
 package context
 
 import (
+	"appengine"
 	"appengine/datastore"
 	"appengine/memcache"
+	"appengine/taskqueue"
 	"fmt"
 	gin "github.com/gamescores/gin"
 	"math/rand"
+	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -16,20 +20,40 @@ func createAdminService() adminService {
 	return adminService{}
 }
 
-func (as adminService) CreateRoutes(parentRoute *gin.RouterGroup) {
+func (as adminService) CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gin.RouterGroup) {
 	admin := parentRoute.Group("/admin")
-	admin.GET("/sample", mustBeAdmin(), as.createSampleData)
+	admin.GET("/sample", mustBeAdmin(), as.createSampleDataTask)
+
+	taskQueues := rootRoute.Group("/tasks")
+	taskQueues.POST("/sample", as.createSampleData)
+}
+
+func (as adminService) createSampleDataTask(c *gin.Context) {
+	gaeCtx := getGaeContext(c)
+
+	createTask := taskqueue.NewPOSTTask("/tasks/sample", url.Values{})
+	hostName, _ := appengine.ModuleHostname(gaeCtx, appengine.ModuleName(gaeCtx), "", "")
+	createTask.Header = http.Header{
+		"Host": []string{hostName},
+	}
+
+	taskqueue.Add(gaeCtx, createTask, "contextqueue")
+
+	c.String(200, "OK")
 }
 
 func (as adminService) createSampleData(c *gin.Context) {
-	deleteAll(entityGame, c)
-	deleteAll(entityLeague, c)
-	deleteAll(entityPlayer, c)
-	memcache.Flush(getGaeContext(c))
+	gaeCtx := getGaeContext(c)
 
-	playerDao := createPlayerDao(c)
-	leagueDao := createLeagueDao(c)
-	gameDao := createGameDao(c)
+	gaeCtx.Infof("Start generating test data")
+	deleteAll(entityGame, gaeCtx)
+	deleteAll(entityLeague, gaeCtx)
+	deleteAll(entityPlayer, gaeCtx)
+	memcache.Flush(gaeCtx)
+
+	playerDao := playerDao{dao{gaeCtx}}
+	leagueDao := leagueDao{dao{gaeCtx}}
+	gameDao := gameDao{dao{gaeCtx}}
 
 	createdPlayerIds := addPlayers(playerDao, 100)
 	createdLeagueIds := addLeagues(leagueDao, 20)
@@ -137,9 +161,9 @@ func addPlayer(playerDao playerDao, name string, index int, createdPlayerIds []i
 	createdPlayerIds[index] = savedPlayer.ID
 }
 
-func deleteAll(kind string, c *gin.Context) {
+func deleteAll(kind string, c appengine.Context) {
 	q := datastore.NewQuery(kind)
 	q = q.KeysOnly()
-	keys, _ := q.GetAll(getGaeContext(c), nil)
-	datastore.DeleteMulti(getGaeContext(c), keys)
+	keys, _ := q.GetAll(c, nil)
+	datastore.DeleteMulti(c, keys)
 }

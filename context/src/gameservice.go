@@ -18,7 +18,7 @@ func createGameService() gameService {
 	return gameService{}
 }
 
-func (gs gameService) CreateRoutes(parentRoute *gin.RouterGroup) {
+func (gs gameService) CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gin.RouterGroup) {
 	games := parentRoute.Group("/leagues/:leagueId/games")
 	games.GET("", gs.getGames)
 	games.POST("", mustBeAuthenticated(), gs.createGame)

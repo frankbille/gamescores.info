@@ -18,7 +18,7 @@ func createPlayerService() playerService {
 	return playerService{}
 }
 
-func (ps playerService) CreateRoutes(parentRoute *gin.RouterGroup) {
+func (ps playerService) CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gin.RouterGroup) {
 	players := parentRoute.Group("/players")
 	players.GET("", ps.getPlayers)
 	players.POST("", mustBeAuthenticated(), ps.createPlayer)
@@ -143,8 +143,6 @@ func addGetPlayerListByIDLinks(games *Games, playerIds []int64, c *gin.Context) 
 
 	q := playerListURL.Query()
 	for _, playerID := range playerIds {
-
-		getGaeContext(c).Infof("PlayerID: %v", fmt.Sprintf("%d", playerID))
 		q.Add("id", fmt.Sprintf("%d", playerID))
 	}
 	playerListURL.RawQuery = q.Encode()

@@ -7,6 +7,10 @@ handlers:
 - url: /api/.*
   script: _go_app
 
+- url: /tasks/.*
+  script: _go_app
+  login: admin
+
 - url: /scripts
   static_dir: dist/scripts
 

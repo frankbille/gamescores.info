@@ -13,16 +13,18 @@ const (
 )
 
 type restService interface {
-	CreateRoutes(parentRoute *gin.RouterGroup)
+	CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gin.RouterGroup)
 }
 
 func init() {
 	r := gin.New()
 
-	r.Use(gaeContext())
-	r.Use(resolveUser())
+	root := r.Group("/")
 
-	api := r.Group("/api")
+	root.Use(gaeContext())
+	root.Use(resolveUser())
+
+	api := root.Group("/api")
 
 	// Create list of services used
 	services := []restService{
@@ -35,7 +37,7 @@ func init() {
 
 	// Process the services
 	for _, service := range services {
-		service.CreateRoutes(api)
+		service.CreateRoutes(api, root)
 	}
 
 	http.Handle("/", r)

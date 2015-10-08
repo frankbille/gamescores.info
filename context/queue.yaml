@@ -1,0 +1,4 @@
+queue:
+- name: contextqueue
+  rate: 5/s
+  target: context
