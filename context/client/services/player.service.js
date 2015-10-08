@@ -1,12 +1,8 @@
 angular.module('GameScoresApp').factory('PlayerService', function($http, $q) {
   return {
-    getPlayersByIdList: function(playerIdList) {
+    getPlayersByIdLink: function(link) {
       var deferred = $q.defer();
-      $http.get('/api/players', {
-        params: {
-          ids: playerIdList
-        }
-      }).then(function(response) {
+      $http.get(link).then(function(response) {
         var playerMap = {};
 
         angular.forEach(response.data.players, function(player) {

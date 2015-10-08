@@ -17,35 +17,30 @@ angular.module('GameScoresApp').factory('GameService', function($http,
 
   return {
     getGamesForLeague: function(leagueId) {
+      return this.getGamesForLink('/api/leagues/' + leagueId + '/games');
+    },
+
+    getGamesForLink: function(hyperlink) {
       var deferred = $q.defer();
-      $http.get('/api/leagues/' + leagueId + '/games').then(function(
+      $http.get(hyperlink).then(function(
         gameListData) {
         var gameList = gameListData.data;
-        var playerIds = {};
-        angular.forEach(gameList.games, function(game) {
-          addPlayerIdsToMap(game.team1.players, playerIds);
-          addPlayerIdsToMap(game.team2.players, playerIds);
-        });
 
-        var playerIdList = [];
-        angular.forEach(playerIds, function(value, playerId) {
-          playerIdList.push(playerId);
-        })
+        PlayerService.getPlayersByIdLink(gameList._links.playerlist.href)
+          .then(function(
+            playerMap) {
 
-        PlayerService.getPlayersByIdList(playerIdList).then(function(
-          playerMap) {
+            angular.forEach(gameList.games, function(game) {
+              game.team1.players = replacePlayerWithObject(game
+                .team1.players, playerMap);
+              game.team2.players = replacePlayerWithObject(game
+                .team2.players, playerMap);
 
-          angular.forEach(gameList.games, function(game) {
-            game.team1.players = replacePlayerWithObject(game
-              .team1.players, playerMap);
-            game.team2.players = replacePlayerWithObject(game
-              .team2.players, playerMap);
+              game.gameDate = moment(game.gameDate);
+            });
 
-            game.gameDate = moment(game.gameDate);
-          });
-
-          deferred.resolve(gameList);
-        }, deferred.reject);
+            deferred.resolve(gameList);
+          }, deferred.reject);
       }, deferred.reject);
       return deferred.promise;
     }

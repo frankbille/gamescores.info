@@ -1,16 +1,11 @@
 <md-progress-circular md-mode="indeterminate" ng-hide="gameList"></md-progress-circular>
 
-<md-list>
-  <md-list-item class="md-2-line" ng-repeat="game in gameList.games">
-    <div class="md-list-item-text" layout="column">
-      <h3>
-        <span ng-repeat="player in game.team1.players | orderBy:name">{{player.name}}{{$last ? '' : '/'}}</span>
-        <strong>vs.</strong>
-        <span ng-repeat="player in game.team2.players | orderBy:name">{{player.name}}{{$last ? '' : '/'}}</span>
-        -
-        <strong>{{game.team1.score}}:{{game.team2.score}}</strong>
-      </h3>
-      <h4>{{ game.gameDate.format('LL') }}</h4>
-    </div>
-  </md-list-item>
-</md-list>
+<md-virtual-repeat-container id="gameList" ng-style="getListHeight()">
+  <div md-virtual-repeat="game in gameList" md-on-demand layout="row">
+    <div layout="row" layout-align="center center" class="md-body-1 gamecell" flex="20">{{ game.gameDate.format('YYYY-MM-DD') }}</div>
+    <div layout="row" layout-align="center center" class="md-body-1 gamecell" flex="30"><span ng-repeat="player in game.team1.players | orderBy:name">{{player.name}}{{$last ? '' : '&nbsp;+&nbsp;'}}</span></div>
+    <div layout="row" layout-align="center center" class="md-body-1 gamecell" flex="10"><strong>vs.</strong></div>
+    <div layout="row" layout-align="center center" class="md-body-1 gamecell" flex="30"><span ng-repeat="player in game.team2.players | orderBy:name">{{player.name}}{{$last ? '' : '&nbsp;+&nbsp;'}}</span></div>
+    <div layout="row" layout-align="center center" class="md-body-1 gamecell" flex="10"><strong>{{game.team1.score}}:{{game.team2.score}}</strong></div>
+  </div>
+</md-virtual-repeat-container>
