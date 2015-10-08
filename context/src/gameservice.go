@@ -34,7 +34,7 @@ func (gs gameService) getGames(c *gin.Context) {
 	}
 
 	currentPage := getCurrentPage(c)
-	recordsPerPage := 100
+	recordsPerPage := 50
 	start := getStartRecord(currentPage, recordsPerPage)
 
 	gameDao := createGameDao(c)
