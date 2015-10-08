@@ -29,7 +29,7 @@ func (gs gameService) getGames(c *gin.Context) {
 	leagueID := getLeagueIDFromURL(c)
 
 	if leagueID <= 0 {
-		c.Redirect(304, "/api/leagues")
+		c.Redirect(302, "/api/leagues")
 		return
 	}
 
@@ -72,7 +72,7 @@ func (gs gameService) getGame(c *gin.Context) {
 	leagueID := getLeagueIDFromURL(c)
 
 	if leagueID <= 0 {
-		c.Redirect(304, "/api/leagues")
+		c.Redirect(302, "/api/leagues")
 		return
 	}
 
