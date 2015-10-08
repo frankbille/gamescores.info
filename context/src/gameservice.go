@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	relCreateGame RelType = "create-game"
+	relCreateGame RelType = "creategame"
+	relGames      RelType = "games"
 )
 
 type gameService struct {
@@ -34,7 +35,7 @@ func (gs gameService) getGames(c *gin.Context) {
 	}
 
 	currentPage := getCurrentPage(c)
-	recordsPerPage := 50
+	recordsPerPage := 1
 	start := getStartRecord(currentPage, recordsPerPage)
 
 	gameDao := createGameDao(c)
@@ -59,11 +60,7 @@ func (gs gameService) getGames(c *gin.Context) {
 		Total: totalGameCount,
 	}
 
-	gamesURL := fmt.Sprintf("/api/leagues/%d/games", leagueID)
-	addPaginationLinks(games, gamesURL, currentPage, recordsPerPage, totalGameCount)
-	if isAuthenticated(c) {
-		games.AddLink(relCreate, gamesURL)
-	}
+	gs.addGamesLinks(games, leagueID, currentPage, recordsPerPage, totalGameCount, c)
 
 	c.JSON(200, games)
 }
@@ -79,7 +76,7 @@ func (gs gameService) getGame(c *gin.Context) {
 	gameID := getGameIDFromURL(c)
 
 	if gameID <= 0 {
-		c.Redirect(304, fmt.Sprintf("/api/leagues/%d/games", leagueID))
+		c.Redirect(302, fmt.Sprintf("/api/leagues/%d/games", leagueID))
 		return
 	}
 
@@ -137,6 +134,37 @@ func (gs gameService) addGameLinks(leagueID int64, game *Game, c *gin.Context) {
 
 	if isAuthenticated(c) {
 		game.AddLink(relUpdate, gameURL)
+	}
+}
+
+func (gs gameService) addGamesLinks(games *Games, leagueID int64, currentPage, recordsPerPage, totalGameCount int, c *gin.Context) {
+	gamesURL := fmt.Sprintf("/api/leagues/%d/games", leagueID)
+	addPaginationLinks(games, gamesURL, currentPage, recordsPerPage, totalGameCount)
+	if isAuthenticated(c) {
+		games.AddLink(relCreate, gamesURL)
+	}
+
+	// Create a unique list of player id's from all the games returned
+	playerIDSet := NewInt64Set()
+	for _, game := range games.Games {
+		gs.addPlayerIdsFromGameTeam(playerIDSet, game.Team1)
+		gs.addPlayerIdsFromGameTeam(playerIDSet, game.Team2)
+	}
+	addGetPlayerListByIDLinks(games, playerIDSet.Values(), c)
+}
+
+func (gs gameService) addPlayerIdsFromGameTeam(playerIDSet *Int64Set, gameTeam GameTeam) {
+	for _, playerID := range gameTeam.Players {
+		playerIDSet.Add(playerID)
+	}
+}
+
+func addLeagueGameLinks(league *League, c *gin.Context) {
+	gamesURL := fmt.Sprintf("/api/leagues/%d/games", league.ID)
+	league.AddLink(relGames, gamesURL)
+
+	if isAuthenticated(c) {
+		league.AddLink(relCreateGame, gamesURL)
 	}
 }
 

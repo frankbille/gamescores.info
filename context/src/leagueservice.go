@@ -124,9 +124,5 @@ func addLeagueLinks(league *League, c *gin.Context) {
 
 	league.AddLink(relSelf, selfURL)
 
-	if isAuthenticated(c) {
-		league.AddLink(relUpdate, selfURL)
-		gameURL := fmt.Sprintf("/api/leagues/%d/games", league.ID)
-		league.AddLink(relCreateGame, gameURL)
-	}
+	addLeagueGameLinks(league, c)
 }

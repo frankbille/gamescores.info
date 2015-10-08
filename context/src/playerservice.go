@@ -3,7 +3,12 @@ package context
 import (
 	"fmt"
 	gin "github.com/gamescores/gin"
+	"net/url"
 	"strconv"
+)
+
+const (
+	relPlayerList RelType = "playerlist"
 )
 
 type playerService struct {
@@ -126,4 +131,23 @@ func addPlayerLinks(player *Player, c *gin.Context) {
 	if isAuthenticated(c) {
 		player.AddLink(relUpdate, selfURL)
 	}
+}
+
+func addGetPlayerListByIDLinks(games *Games, playerIds []int64, c *gin.Context) {
+	playerListURL, err := url.Parse("/api/players")
+
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
+
+	q := playerListURL.Query()
+	for _, playerID := range playerIds {
+
+		getGaeContext(c).Infof("PlayerID: %v", fmt.Sprintf("%d", playerID))
+		q.Add("id", fmt.Sprintf("%d", playerID))
+	}
+	playerListURL.RawQuery = q.Encode()
+
+	games.AddLink(relPlayerList, playerListURL.String())
 }
