@@ -27,6 +27,16 @@ func (ps playerService) CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gi
 }
 
 func (ps playerService) getPlayers(c *gin.Context) {
+	idList := c.Request.URL.Query()["id"]
+
+	if len(idList) == 0 {
+		ps.handleGetAllPlayers(c)
+	} else {
+		ps.handleGetSpecificPlayers(c, idList)
+	}
+}
+
+func (ps playerService) handleGetAllPlayers(c *gin.Context) {
 	var currentPage = getCurrentPage(c)
 	var recordsPerPage = 50
 	var start = getStartRecord(currentPage, recordsPerPage)
@@ -55,6 +65,40 @@ func (ps playerService) getPlayers(c *gin.Context) {
 	addPaginationLinks(players, "/api/players", currentPage, recordsPerPage, totalPlayerCount)
 	if isAuthenticated(c) {
 		players.AddLink(relCreate, "/api/players")
+	}
+
+	c.JSON(200, players)
+}
+
+func (ps playerService) handleGetSpecificPlayers(c *gin.Context, idList []string) {
+	playerDao := createPlayerDao(c)
+
+	playerIds := make([]int64, len(idList))
+	idx := 0
+	for _, id := range idList {
+		playerID, err := strconv.ParseInt(id, 10, 64)
+		if err != nil {
+			getGaeContext(c).Infof("%v", err)
+			c.AbortWithError(500, err)
+			return
+		}
+		playerIds[idx] = playerID
+		idx++
+	}
+
+	playerArray, err := playerDao.getAllPlayersByID(playerIds)
+	if err != nil {
+		getGaeContext(c).Infof("%v", err)
+		c.AbortWithError(500, err)
+		return
+	}
+
+	for index := range playerArray {
+		addPlayerLinks(&playerArray[index], c)
+	}
+
+	players := &Players{
+		Players: playerArray,
 	}
 
 	c.JSON(200, players)

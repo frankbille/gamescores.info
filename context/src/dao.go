@@ -17,13 +17,11 @@ func createDao(gaeCtx appengine.Context) dao {
 }
 
 func (dao *dao) get(key *datastore.Key, dataObject interface{}) error {
-	err := datastore.Get(dao.Context, key, dataObject)
+	return datastore.Get(dao.Context, key, dataObject)
+}
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (dao *dao) getByIds(keys []*datastore.Key, dataObjects interface{}) error {
+	return datastore.GetMulti(dao.Context, keys, dataObjects)
 }
 
 func (dao *dao) getList(entityType string, start, limit int, dataObjects interface{}) (int, error) {
@@ -37,14 +35,8 @@ func (dao *dao) getList(entityType string, start, limit int, dataObjects interfa
 		return 0, err
 	}
 
-	count, err := datastore.NewQuery(entityType).
+	return datastore.NewQuery(entityType).
 		Count(dao.Context)
-
-	if err != nil {
-		return 0, err
-	}
-
-	return count, nil
 }
 
 func (dao *dao) getListForAncestor(entityType string, start, limit int, ancestor *datastore.Key, orderByFields []string, dataObjects interface{}) (int, error) {
@@ -65,15 +57,9 @@ func (dao *dao) getListForAncestor(entityType string, start, limit int, ancestor
 		return 0, err
 	}
 
-	count, err := datastore.NewQuery(entityType).
+	return datastore.NewQuery(entityType).
 		Ancestor(ancestor).
 		Count(dao.Context)
-
-	if err != nil {
-		return 0, err
-	}
-
-	return count, nil
 }
 
 func (dao *dao) getByFilter(entityType, propertyName, propertyValue string, dataObjects interface{}) error {
@@ -82,19 +68,11 @@ func (dao *dao) getByFilter(entityType, propertyName, propertyValue string, data
 
 	_, err := q.GetAll(dao.Context, dataObjects)
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (dao *dao) save(key *datastore.Key, obj interface{}) (interface{}, error) {
 	_, err := datastore.Put(dao.Context, key, obj)
 
-	if err != nil {
-		return nil, err
-	}
-
-	return obj, nil
+	return obj, err
 }

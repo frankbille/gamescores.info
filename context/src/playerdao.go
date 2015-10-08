@@ -24,6 +24,22 @@ func (dao *playerDao) getPlayers(start, limit int) ([]Player, int, error) {
 	return players, count, err
 }
 
+func (dao *playerDao) getAllPlayersByID(playerIds []int64) ([]Player, error) {
+	players := make([]Player, len(playerIds))
+
+	keys := make([]*datastore.Key, len(playerIds))
+	idx := 0
+	for _, playerID := range playerIds {
+		key := datastore.NewKey(dao.Context, entityPlayer, "", playerID, nil)
+		keys[idx] = key
+		idx++
+	}
+
+	err := dao.getByIds(keys, players)
+
+	return players, err
+}
+
 func (dao *playerDao) getPlayer(playerID int64) (*Player, error) {
 	var player Player
 	key := datastore.NewKey(dao.Context, entityPlayer, "", playerID, nil)
