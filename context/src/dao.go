@@ -47,11 +47,17 @@ func (dao *dao) getList(entityType string, start, limit int, dataObjects interfa
 	return count, nil
 }
 
-func (dao *dao) getListForAncestor(entityType string, start, limit int, ancestor *datastore.Key, dataObjects interface{}) (int, error) {
+func (dao *dao) getListForAncestor(entityType string, start, limit int, ancestor *datastore.Key, orderByFields []string, dataObjects interface{}) (int, error) {
 	q := datastore.NewQuery(entityType).
 		Ancestor(ancestor).
 		Offset(start).
 		Limit(limit)
+
+	if orderByFields != nil {
+		for _, orderByField := range orderByFields {
+			q = q.Order(orderByField)
+		}
+	}
 
 	_, err := q.GetAll(dao.Context, dataObjects)
 

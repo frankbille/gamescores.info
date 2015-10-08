@@ -20,7 +20,7 @@ func (dao *gameDao) getGames(start, limit int, leagueID int64) ([]Game, int, err
 	var games []Game
 
 	leagueKey := datastore.NewKey(dao.Context, entityLeague, "", leagueID, nil)
-	count, err := dao.getListForAncestor(entityGame, start, limit, leagueKey, &games)
+	count, err := dao.getListForAncestor(entityGame, start, limit, leagueKey, []string{"-GameDate"}, &games)
 
 	return games, count, err
 }
