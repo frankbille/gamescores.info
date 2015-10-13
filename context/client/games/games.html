@@ -1,11 +1,32 @@
 <md-progress-circular md-mode="indeterminate" ng-hide="gameList"></md-progress-circular>
 
 <md-virtual-repeat-container id="gameList" ng-style="getListHeight()">
-  <div md-virtual-repeat="game in gameList" md-on-demand layout="row">
-    <div layout="row" layout-align="center center" class="md-body-1 gamecell" flex="20">{{ game.gameDate.format('YYYY-MM-DD') }}</div>
-    <div layout="row" layout-align="center center" class="md-body-1 gamecell" flex="30"><span ng-repeat="player in game.team1.players | orderBy:name">{{player.name}}{{$last ? '' : '&nbsp;+&nbsp;'}}</span></div>
-    <div layout="row" layout-align="center center" class="md-body-1 gamecell" flex="10"><strong>vs.</strong></div>
-    <div layout="row" layout-align="center center" class="md-body-1 gamecell" flex="30"><span ng-repeat="player in game.team2.players | orderBy:name">{{player.name}}{{$last ? '' : '&nbsp;+&nbsp;'}}</span></div>
-    <div layout="row" layout-align="center center" class="md-body-1 gamecell" flex="10"><strong>{{game.team1.score}}:{{game.team2.score}}</strong></div>
+  <!-- <md-list>
+    <md-list-item md-virtual-repeat="game in gameList" md-on-demand class="md-2-line">
+      <div class="md-avatar">3.</div>
+      <div class="md-list-item-text">
+        <h3>
+          <span ng-repeat="player in game.team1.players | orderBy:name">{{player.name}}{{$last ? '' : '&nbsp;+&nbsp;'}}</span>
+          <strong>vs.</strong>
+          <span ng-repeat="player in game.team2.players | orderBy:name">{{player.name}}{{$last ? '' : '&nbsp;+&nbsp;'}}</span>
+        </h3>
+        <p>{{ game.gameDate.format('YYYY-MM-DD') }}</p>
+      </div>
+      <div class="md-secondary">{{game.team1.score}}:{{game.team2.score}}</div>
+    </md-list-item>
+  </md-list> -->
+  <div md-virtual-repeat="game in gameList" md-on-demand layout="row" style="height:60px">
+    <div layout="column" layout-align="center center" layout-padding flex>
+      <div layout="row" class="md-title">{{::game.gameDate.format('D')}}</div>
+      <div layout="row" class="md-body-1">{{::game.gameDate.format('MMM')}}</div>
+    </div>
+    <div layout="row" layout-align="center center" class="md-body-1" layout-padding flex>
+      <span ng-repeat="player in game.team1.players | orderBy:name">{{player.name}}{{$last ? '' : '&nbsp;+&nbsp;'}}</span>
+    </div>
+    <div layout="row" layout-align="center center" class="md-body-2" layout-padding flex>vs.</div>
+    <div layout="row" layout-align="center center" class="md-body-1" layout-padding flex>
+      <span ng-repeat="player in game.team2.players | orderBy:name">{{player.name}}{{$last ? '' : '&nbsp;+&nbsp;'}}</span>
+    </div>
+    <div layout="row" layout-align="center center" class="md-body-2" flex>{{game.team1.score}}:{{game.team2.score}}</div>
   </div>
 </md-virtual-repeat-container>

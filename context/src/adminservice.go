@@ -56,7 +56,7 @@ func (as adminService) createSampleData(c *gin.Context) {
 	gameDao := gameDao{dao{gaeCtx}}
 
 	createdPlayerIds := addPlayers(playerDao, 100)
-	createdLeagueIds := addLeagues(leagueDao, 20)
+	createdLeagueIds := addLeagues(leagueDao, 5)
 	addGames(gameDao, 2000, time.Now(), createdLeagueIds, createdPlayerIds)
 
 	c.String(200, "OK")
@@ -67,6 +67,9 @@ func addGames(gameDao gameDao, numGames int, endDate time.Time, createdLeagueIds
 	for i := 0; i < numGames; i++ {
 		addGame(gameDao, date, createdLeagueIds, createdPlayerIds)
 		date = date.AddDate(0, 0, 1)
+		if i%100==0 {
+			gameDao.Context.Infof("Games created %d/%d", i, numGames)
+		}
 	}
 }
 

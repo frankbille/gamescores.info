@@ -46,6 +46,7 @@ func (ps playerService) handleGetAllPlayers(c *gin.Context) {
 	playerArray, totalPlayerCount, err := playerDao.getPlayers(start, recordsPerPage)
 
 	if err != nil {
+		getGaeContext(c).Errorf("Error loading players: %v", err)
 		c.AbortWithError(500, err)
 		return
 	}
@@ -78,7 +79,7 @@ func (ps playerService) handleGetSpecificPlayers(c *gin.Context, idList []string
 	for _, id := range idList {
 		playerID, err := strconv.ParseInt(id, 10, 64)
 		if err != nil {
-			getGaeContext(c).Infof("%v", err)
+			getGaeContext(c).Errorf("Not an integer: %v", err)
 			c.AbortWithError(500, err)
 			return
 		}
@@ -88,7 +89,7 @@ func (ps playerService) handleGetSpecificPlayers(c *gin.Context, idList []string
 
 	playerArray, err := playerDao.getAllPlayersByID(playerIds)
 	if err != nil {
-		getGaeContext(c).Infof("%v", err)
+		getGaeContext(c).Errorf("Error getting players by id: %v", err)
 		c.AbortWithError(500, err)
 		return
 	}
@@ -117,6 +118,7 @@ func (ps playerService) getPlayer(c *gin.Context) {
 	player, err := playerDao.getPlayer(playerID)
 
 	if err != nil {
+		getGaeContext(c).Errorf("Error loading player: %v", err)
 		c.AbortWithError(500, err)
 		return
 	}
@@ -150,6 +152,7 @@ func (ps playerService) doSavePlayer(player Player, c *gin.Context) {
 	savedPlayer, err := playerDao.savePlayer(player)
 
 	if err != nil {
+		getGaeContext(c).Errorf("Error saving player: %v", err)
 		c.AbortWithError(500, err)
 	}
 
@@ -181,6 +184,7 @@ func addGetPlayerListByIDLinks(games *Games, playerIds []int64, c *gin.Context) 
 	playerListURL, err := url.Parse("/api/players")
 
 	if err != nil {
+		getGaeContext(c).Errorf("Error parsing URL: %v", err)
 		c.AbortWithError(500, err)
 		return
 	}

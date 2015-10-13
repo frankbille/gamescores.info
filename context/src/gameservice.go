@@ -43,6 +43,7 @@ func (gs gameService) getGames(c *gin.Context) {
 	gameArray, totalGameCount, err := gameDao.getGames(start, recordsPerPage, leagueID)
 
 	if err != nil {
+		getGaeContext(c).Errorf("Error loading games: %v", err)
 		c.AbortWithError(500, err)
 		return
 	}
@@ -85,6 +86,7 @@ func (gs gameService) getGame(c *gin.Context) {
 	game, err := gameDao.getGame(leagueID, gameID)
 
 	if err != nil {
+		getGaeContext(c).Errorf("Error loading game: %v", err)
 		c.AbortWithError(500, err)
 		return
 	}
@@ -120,6 +122,7 @@ func (gs gameService) doSaveGame(game Game, c *gin.Context) {
 	savedGame, err := gameDao.saveGame(game)
 
 	if err != nil {
+		getGaeContext(c).Errorf("Error saving game: %v", err)
 		c.AbortWithError(500, err)
 	}
 

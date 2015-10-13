@@ -1,9 +1,9 @@
 package context
 
 import (
-	appengine "appengine"
+	"appengine"
 	datastore "appengine/datastore"
-	fmt "fmt"
+	"fmt"
 )
 
 type dao struct {
