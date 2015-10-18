@@ -26,6 +26,9 @@ handlers:
 - url: /services
   static_dir: client/services
 
+- url: /directives
+  static_dir: client/directives
+
 - url: /styles
   static_dir: client/styles
 

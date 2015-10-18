@@ -1,0 +1,73 @@
+<md-dialog aria-label="Game Dialog" ng-cloak flex="50" flex-sm="100">
+    <form ng-submit="save()">
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>{{title}}</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <md-icon md-svg-icon="navigation:close" aria-label="Close dialog"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content">
+
+                <div ng-hide="playerIdMap">
+                    <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+                </div>
+
+                <div ng-show="playerIdMap">
+                    <md-datepicker required ng-model="game.gameDate" md-placeholder="Game date"></md-datepicker>
+
+                    <h3>Team 1</h3>
+
+                    <md-chips ng-model="game.team1.players" md-autocomplete-snap md-require-match="true"
+                              secondary-placeholder="">
+                        <md-autocomplete
+                                md-search-text="searchText"
+                                md-items="playerId in searchPlayers(searchText)"
+                                md-no-cache
+                                placeholder="Players">
+                            <span md-highlight-text="searchText" md-highlight-flags="i">{{playerName(playerId)}}</span>
+                        </md-autocomplete>
+                        <md-chip-template>
+                            <span><strong>{{playerName($chip)}}</strong></span>
+                        </md-chip-template>
+                    </md-chips>
+
+                    <md-input-container>
+                        <label>Score</label>
+                        <input ng-model="game.team1.score" placeholder="Score"
+                               required type="number" min="0">
+                    </md-input-container>
+
+                    <h3>Team 2</h3>
+
+                    <md-chips ng-model="game.team2.players" md-autocomplete-snap md-require-match="true"
+                              secondary-placeholder="">
+                        <md-autocomplete
+                                md-search-text="searchText"
+                                md-items="playerId in searchPlayers(searchText)"
+                                md-no-cache
+                                placeholder="Players">
+                            <span md-highlight-text="searchText" md-highlight-flags="i">{{playerName(playerId)}}</span>
+                        </md-autocomplete>
+                        <md-chip-template>
+                            <span><strong>{{playerName($chip)}}</strong></span>
+                        </md-chip-template>
+                    </md-chips>
+
+                    <md-input-container>
+                        <label>Score</label>
+                        <input ng-model="game.team2.score" placeholder="Score"
+                               required type="number" min="0">
+                    </md-input-container>
+                </div>
+
+            </div>
+        </md-dialog-content>
+        <div class="md-actions">
+            <md-button class="md-primary">Save</md-button>
+        </div>
+    </form>
+</md-dialog>

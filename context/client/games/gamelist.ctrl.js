@@ -1,61 +1,52 @@
-angular.module('GameScoresApp').controller('GameListCtrl', function($scope,
-  GameService, $stateParams, $window) {
-  $scope.getListHeight = function() {
-    return {
-      height: '' + ($window.innerHeight - 72) + 'px'
-    };
-  };
-
-  function onResize() {
-    $scope.$digest();
-  }
-  $window.addEventListener('resize', onResize);
-  $scope.$on('$destroy', function() {
-    $window.removeEventListener('resize', onResize);
-  });
-
-  GameService.getGamesForLeague($stateParams.leagueId).then(
-    function(gameList) {
-      $scope.gameList = {
-        gameList: gameList.games,
-        total: gameList.total,
-        numLoaded: gameList.games.length,
-        nextLink: gameList._links.next.href,
-        loading: false,
-
-        getLength: function() {
-          var length = this.numLoaded + 5;
-          if (length > this.total) {
-            length = this.total;
-          }
-          return length;
-        },
-
-        getItemAtIndex: function(index) {
-          if (index >= this.numLoaded) {
-            if (this.nextLink != null && !this.loading) {
-              var ga = this;
-              ga.loading = true;
-              GameService.getGamesForLink(this.nextLink).then(
-                function(
-                  gameList) {
-                  ga.total = gameList.total;
-                  ga.numLoaded += gameList.games.length;
-                  if (angular.isDefined(gameList._links.next)) {
-                    ga.nextLink = gameList._links.next.href;
-                  } else {
-                    ga.nextLink = null;
-                  }
-                  angular.forEach(gameList.games, function(game) {
-                    ga.gameList.push(game);
-                  });
-                  ga.loading = false;
-                });
-            }
-            return null;
-          }
-          return this.gameList[index];
-        }
-      };
+angular.module('GameScoresApp').controller('GameListCtrl', function ($scope, GameService, LeagueService, $stateParams) {
+    LeagueService.getLeague($stateParams.leagueId).then(function(league) {
+       $scope.league = league;
     });
+
+    $scope.gameDates = [];
+    var gameDateMap = {};
+    var nextLink = null;
+    var hasNextLink = true;
+
+    var processGameList = function(gameList) {
+        // Next link
+        if (gameList._links.next && gameList._links.next.href) {
+            nextLink = gameList._links.next.href;
+            hasNextLink = true;
+        } else {
+            nextLink = null;
+            hasNextLink = false;
+        }
+
+        // Process games
+        angular.forEach(gameList.games, function (game) {
+            var gameDateKey = game.gameDate.format('YYYY-MM-DD');
+
+            var gameDateObject = gameDateMap[gameDateKey];
+            if (angular.isUndefined(gameDateObject)) {
+                gameDateObject = {
+                    date: game.gameDate,
+                    games: []
+                };
+                gameDateMap[gameDateKey] = gameDateObject;
+                $scope.gameDates.push(gameDateObject);
+            }
+
+            gameDateObject.games.push(game);
+        });
+    };
+
+    $scope.loadMore = function() {
+        if (hasNextLink) {
+            if (nextLink != null) {
+                GameService.getGamesForLink(nextLink).then(processGameList);
+            } else {
+                GameService.getGamesForLeague($stateParams.leagueId).then(processGameList);
+            }
+        }
+    };
+
+    $scope.loadMore();
+
+
 });

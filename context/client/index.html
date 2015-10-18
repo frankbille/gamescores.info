@@ -26,7 +26,7 @@
         <md-menu>
           <md-button ng-click="$mdOpenMenu($event)">Leagues</md-button>
           <md-menu-content width="4">
-            <md-menu-item ng-repeat="league in leagueList.leagues | orderBy:name">
+            <md-menu-item ng-repeat="league in leagueList.leagues">
               <md-button ui-sref="games({leagueId: league.id})">{{league.name}}</md-button>
             </md-menu-item>
           </md-menu-content>
@@ -38,9 +38,9 @@
       </div>
     </md-toolbar>
 
-    <md-content flex>
-      <div ui-view></div>
-    </md-content>
+    <md-content flex layout-padding ui-view="main"></md-content>
+
+    <div ui-view="footer"></div>
 
     <!-- build:js /scripts/vendor.js -->
     <!-- bower:js -->
@@ -61,8 +61,11 @@
     <script src="services/league.service.js"></script>
     <script src="services/player.service.js"></script>
     <script src="services/game.service.js"></script>
+    <script src="directives/infinite-scroll.directive.js"></script>
     <script src="menu/menu.ctrl.js"></script>
     <script src="games/gamelist.ctrl.js"></script>
+    <script src="games/addgamebutton.ctrl.js"></script>
+    <script src="games/gamedialog.ctrl.js"></script>
     <!-- endbuild -->
   </body>
 </html>
