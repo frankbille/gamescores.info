@@ -66,7 +66,11 @@ func addGames(gameDao gameDao, numGames int, endDate time.Time, createdLeagueIds
 	date := endDate.AddDate(0, 0, 0-numGames)
 	for i := 0; i < numGames; i++ {
 		addGame(gameDao, date, createdLeagueIds, createdPlayerIds)
-		date = date.AddDate(0, 0, 1)
+
+		if (getRandomID([]int64{0,0,0,0,0,0,0,0,0,1}) == 1) {
+			date = date.AddDate(0, 0, 1)
+		}
+
 		if i%100==0 {
 			gameDao.Context.Infof("Games created %d/%d", i, numGames)
 		}
