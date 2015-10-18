@@ -16,7 +16,7 @@ angular.module('GameScoresApp').config(function ($stateProvider,
             url: '/leagues/{leagueId:int}/games',
             views: {
                 main: {
-                    templateUrl: '/games/games.html',
+                    templateUrl: '/games/gamelist.html',
                     controller: 'GameListCtrl'
                 },
                 footer: {

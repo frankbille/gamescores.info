@@ -4,18 +4,19 @@ angular.module('GameScoresApp').controller('GameListCtrl', function ($scope, Gam
     });
 
     $scope.gameDates = [];
+    $scope.hasNextLink = true;
+    $scope.loading = false;
     var gameDateMap = {};
     var nextLink = null;
-    var hasNextLink = true;
 
     var processGameList = function(gameList) {
         // Next link
         if (gameList._links.next && gameList._links.next.href) {
             nextLink = gameList._links.next.href;
-            hasNextLink = true;
+            $scope.hasNextLink = true;
         } else {
             nextLink = null;
-            hasNextLink = false;
+            $scope.hasNextLink = false;
         }
 
         // Process games
@@ -34,10 +35,14 @@ angular.module('GameScoresApp').controller('GameListCtrl', function ($scope, Gam
 
             gameDateObject.games.push(game);
         });
+
+        $scope.loading = false;
     };
 
     $scope.loadMore = function() {
-        if (hasNextLink) {
+        if ($scope.hasNextLink) {
+            $scope.loading = true;
+
             if (nextLink != null) {
                 GameService.getGamesForLink(nextLink).then(processGameList);
             } else {
@@ -47,6 +52,4 @@ angular.module('GameScoresApp').controller('GameListCtrl', function ($scope, Gam
     };
 
     $scope.loadMore();
-
-
 });

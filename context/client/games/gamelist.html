@@ -21,3 +21,10 @@
         </div>
     </div>
 </section>
+
+<div layout="column" flex="50" layout-align="start center">
+    <md-progress-circular ng-show="loading" md-mode="indeterminate" md-diameter="32"></md-progress-circular>
+    <md-button class="md-raised md-primary" ng-click="loadMore()" ng-show="hasNextLink && !loading">
+        Load more games
+    </md-button>
+</div>
