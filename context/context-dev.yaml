@@ -17,11 +17,8 @@ handlers:
 - url: /config
   static_dir: client/config
 
-- url: /games
-  static_dir: client/games
-
-- url: /menu
-  static_dir: client/menu
+- url: /components
+  static_dir: client/components
 
 - url: /services
   static_dir: client/services

@@ -1,12 +1,13 @@
 angular
     .module('GameScoresApp')
-    .factory('GameDialog', function ($mdDialog, $state, PlayerService) {
-        return function (leagueId, gameId) {
+    .factory('GameDialog', function ($mdDialog, $state) {
+        return function (leagueId, gameId, event) {
             $mdDialog.show({
                 controller: 'GameDialogCtrl',
-                templateUrl: '/games/gamedialog.html',
+                templateUrl: '/components/games/gamedialog.html',
                 parent: angular.element(document.body),
                 clickOutsideToClose: true,
+                targetEvent: event,
                 locals: {
                     leagueId: leagueId,
                     gameId: gameId

@@ -1,4 +1,4 @@
-angular.module('GameScoresApp').controller('GameListCtrl', function ($scope, GameService, LeagueService, $stateParams) {
+angular.module('GameScoresApp').controller('GameListCtrl', function ($scope, GameService, LeagueService, $stateParams, $state) {
     LeagueService.getLeague($stateParams.leagueId).then(function(league) {
        $scope.league = league;
     });
@@ -52,4 +52,10 @@ angular.module('GameScoresApp').controller('GameListCtrl', function ($scope, Gam
     };
 
     $scope.loadMore();
+
+    $scope.editGame = function(gameId) {
+        $state.go('games.edit', {
+           gameId: gameId
+        });
+    };
 });

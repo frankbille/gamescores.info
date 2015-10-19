@@ -15,7 +15,7 @@
             {{game.team1.score}}:{{game.team2.score}}
         </div>
         <div flex="10" layout="row" layout-align="center center">
-            <md-button aria-label="Edit game" class="md-icon-button" ng-show="game._links.update" ui-sref="games.edit({gameId:game.id})">
+            <md-button aria-label="Edit game" class="md-icon-button" ng-show="game._links.update" ui-sref="games.edit({gameId:game.id})" ng-click="editGame(game.id)">
                 <md-icon md-svg-icon="editor:mode_edit"></md-icon>
             </md-button>
         </div>

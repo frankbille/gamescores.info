@@ -16,11 +16,11 @@ angular.module('GameScoresApp').config(function ($stateProvider,
             url: '/leagues/{leagueId:int}/games',
             views: {
                 main: {
-                    templateUrl: '/games/gamelist.html',
+                    templateUrl: '/components/games/gamelist.html',
                     controller: 'GameListCtrl'
                 },
                 footer: {
-                    templateUrl: '/games/addgamebutton.html',
+                    templateUrl: '/components/games/addgamebutton.html',
                     controller: 'AddGameButtonCtrl'
                 }
             }
@@ -30,7 +30,7 @@ angular.module('GameScoresApp').config(function ($stateProvider,
             // Override onEnter to show a modal dialog instead
             // See https://github.com/angular-ui/ui-router/wiki/Frequently-Asked-Questions#how-to-open-a-dialogmodal-at-a-certain-state
             onEnter: function ($stateParams, GameDialog) {
-                GameDialog($stateParams.leagueId, $stateParams.gameId);
+                GameDialog($stateParams.leagueId, $stateParams.gameId, event);
             }
         })
         .state('games.add', {
@@ -38,7 +38,32 @@ angular.module('GameScoresApp').config(function ($stateProvider,
             // Override onEnter to show a modal dialog instead
             // See https://github.com/angular-ui/ui-router/wiki/Frequently-Asked-Questions#how-to-open-a-dialogmodal-at-a-certain-state
             onEnter: function ($stateParams, GameDialog) {
-                GameDialog($stateParams.leagueId, null);
+                GameDialog($stateParams.leagueId, null, event);
+            }
+        })
+        .state('players', {
+            url: '/players',
+            views: {
+                main: {
+                    templateUrl: '/components/players/playerlist.html',
+                    controller: 'PlayerListCtrl'
+                },
+                footer: {
+                    templateUrl: '/components/players/addplayerbutton.html',
+                    controller: 'AddPlayerButtonCtrl'
+                }
+            }
+        })
+        .state('players.add', {
+            url: '/add',
+            onEnter: function(PlayerDialog) {
+                PlayerDialog(null, event);
+            }
+        })
+        .state('players.edit', {
+            url: '/{playerId:int}',
+            onEnter: function($stateParams, PlayerDialog) {
+                PlayerDialog($stateParams.playerId, event);
             }
         });
 });

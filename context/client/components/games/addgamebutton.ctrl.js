@@ -4,11 +4,8 @@ angular.module('GameScoresApp').controller('AddGameButtonCtrl', function($scope,
        $scope.league = league;
     });
 
-    $scope.openDialog = function(ev) {
-        ev.preventDefault();
-        $state.go('games.add', {
-            ev: ev
-        });
+    $scope.openDialog = function() {
+        $state.go('games.add');
     };
 
 });

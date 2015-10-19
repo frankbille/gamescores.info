@@ -31,6 +31,7 @@
             </md-menu-item>
           </md-menu-content>
         </md-menu>
+        <md-button ui-sref="players">Players</md-button>
         <span flex></span>
         <md-button ng-hide="userLoading || user.loggedIn" ng-href="{{user._links.login.href}}">Login</md-button>
         <md-button ng-show="user.loggedIn" ng-href="{{user._links.logout.href}}">Logout</md-button>
@@ -62,10 +63,13 @@
     <script src="services/player.service.js"></script>
     <script src="services/game.service.js"></script>
     <script src="directives/infinite-scroll.directive.js"></script>
-    <script src="menu/menu.ctrl.js"></script>
-    <script src="games/gamelist.ctrl.js"></script>
-    <script src="games/addgamebutton.ctrl.js"></script>
-    <script src="games/gamedialog.ctrl.js"></script>
+    <script src="components/menu/menu.ctrl.js"></script>
+    <script src="components/games/gamelist.ctrl.js"></script>
+    <script src="components/games/addgamebutton.ctrl.js"></script>
+    <script src="components/games/gamedialog.ctrl.js"></script>
+    <script src="components/players/playerlist.ctrl.js"></script>
+    <script src="components/players/playerdialog.ctrl.js"></script>
+    <script src="components/players/addplayerbutton.ctrl.js"></script>
     <!-- endbuild -->
   </body>
 </html>

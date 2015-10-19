@@ -1,0 +1,7 @@
+<h1 class="md-display-1">Players</h1>
+
+<md-list>
+    <md-list-item ng-repeat="player in players | orderBy:'name'" ui-sref="players.edit({playerId:player.id})" ng-click="editPlayer(player.id)">
+        <p>{{player.name}}</p>
+    </md-list-item>
+</md-list>
