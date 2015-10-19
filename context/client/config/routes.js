@@ -65,5 +65,11 @@ angular.module('GameScoresApp').config(function ($stateProvider,
             onEnter: function($stateParams, PlayerDialog) {
                 PlayerDialog($stateParams.playerId, event);
             }
+        })
+        .state('about', {
+            url: '/about',
+            onEnter: function(AboutDialog) {
+                AboutDialog(event);
+            }
         });
 });

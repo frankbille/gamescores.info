@@ -36,6 +36,10 @@
         <md-button ng-hide="userLoading || user.loggedIn" ng-href="{{user._links.login.href}}">Login</md-button>
         <md-button ng-show="user.loggedIn" ng-href="{{user._links.logout.href}}">Logout</md-button>
         <md-button aria-label="Avatar" ng-show="user.loggedIn" class="md-icon-button"><img gravatar-src="user.email" gravatar-size="30"></md-button>
+
+        <md-button class="md-icon-button" aria-label="Help" ui-sref="about" ng-click="showAbout()">
+          <md-icon md-svg-icon="action:help"></md-icon>
+        </md-button>
       </div>
     </md-toolbar>
 
@@ -70,6 +74,7 @@
     <script src="components/players/playerlist.ctrl.js"></script>
     <script src="components/players/playerdialog.ctrl.js"></script>
     <script src="components/players/addplayerbutton.ctrl.js"></script>
+    <script src="components/about/aboutdialog.ctrl.js"></script>
     <!-- endbuild -->
   </body>
 </html>

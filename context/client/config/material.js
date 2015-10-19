@@ -4,6 +4,7 @@ angular.module('GameScoresApp').config(function ($mdThemingProvider, $mdIconProv
         .accentPalette('green');
 
     $mdIconProvider
+        .iconSet('action', '/images/action-icons.svg', 24)
         .iconSet('content', '/images/content-icons.svg', 24)
         .iconSet('editor', '/images/editor-icons.svg', 24)
         .iconSet('navigation', '/images/navigation-icons.svg', 24);
