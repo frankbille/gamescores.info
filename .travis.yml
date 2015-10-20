@@ -10,12 +10,20 @@ env:
   - MODULE=default
 
 install:
+# Install for Nodejs/Grunt build
   - cd ${TRAVIS_BUILD_DIR}/$MODULE && npm install
+# Install for Go App Engine build
+  - export FILE=$(curl https://storage.googleapis.com/appengine-sdks/ | grep -o 'featured/go_appengine_sdk_linux_amd64-[^\<]*' | tail -n 1)
+  - curl -O https://storage.googleapis.com/appengine-sdks/$FILE
+  - unzip -q $FILE
 
 script:
+# Nodejs/grunt build
   - cd ${TRAVIS_BUILD_DIR}/$MODULE
   - node_modules/.bin/bower install
   - node_modules/.bin/grunt
+# Go App Engine build
+  - ./go_appengine/goapp build ./$MODULE
 
 cache:
   directories:
