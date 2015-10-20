@@ -37,6 +37,7 @@ deploy:
   keyfile: "${TRAVIS_BUILD_DIR}/service-account.json"
   default: false
   project: gamescores-info
+  verbosity: info
   version: $TRAVIS_BRANCH
   config: ${TRAVIS_BUILD_DIR}/$MODULE/$MODULE.yaml
 

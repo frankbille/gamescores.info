@@ -1,4 +1,3 @@
-application: gamescores-info
 module: context
 api_version: go1
 runtime: go
