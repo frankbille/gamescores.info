@@ -9,10 +9,6 @@ env:
   - MODULE=context
   - MODULE=default
 
-before_install:
-  - openssl aes-256-cbc -K $encrypted_ba78ad1c8b3e_key -iv $encrypted_ba78ad1c8b3e_iv
-      -in service-account.json.enc -out service-account.json -d
-
 install:
 # Install for Go App Engine build
   - export FILE=$(curl https://storage.googleapis.com/appengine-sdks/ | grep -o 'featured/go_appengine_sdk_linux_amd64-[^\<]*' | tail -n 1 | grep -o 'go_appengine_.*')
@@ -33,13 +29,7 @@ script:
   - node_modules/.bin/grunt
 
 deploy:
-  provider: gae
-  keyfile: "${TRAVIS_BUILD_DIR}/service-account.json"
-  default: false
-  project: gamescores-info
-  verbosity: info
-  version: $TRAVIS_BRANCH
-  config: ${TRAVIS_BUILD_DIR}/$MODULE/$MODULE.yaml
+  - ${TRAVIS_BUILD_DIR}/go_appengine/appcfg.py --oauth2_refresh_token=$OAUTH2_REFRESH_TOKEN --oauth2_client_id=$OAUTH2_CLIENT_ID --oauth2_client_secret=$OAUTH2_CLIENT_SECRET update -V $TRAVIS_BRANCH -A gamescores-info ${TRAVIS_BUILD_DIR}/$MODULE/$MODULE.yaml
 
 cache:
   directories:
