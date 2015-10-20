@@ -54,7 +54,6 @@ module.exports = function(grunt) {
         src: [
           '<%= cfg.dist %>/{,*/}*.js',
           '<%= cfg.dist %>/styles/{,*/}*.css',
-          '<%= cfg.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
           '<%= cfg.dist %>/styles/fonts/*'
         ]
       }
@@ -95,6 +94,11 @@ module.exports = function(grunt) {
           ]
         }, {
           expand: true,
+          cwd: '<%= cfg.app %>/images',
+          dest: '<%= cfg.dist %>/images',
+          src: ['*.svg']
+        }, {
+          expand: true,
           cwd: '.tmp/images',
           dest: '<%= cfg.dist %>/images',
           src: ['generated/*']
@@ -119,7 +123,7 @@ module.exports = function(grunt) {
         files: [{
           expand: true,
           cwd: '<%= cfg.app %>',
-          src: ['{,*/}*.html'],
+          src: ['**/*.html'],
           dest: '.tmp'
         }]
       }
@@ -146,7 +150,7 @@ module.exports = function(grunt) {
           prefix: '/'
         },
         cwd: '.tmp',
-        src: ['{,*/}*.html', '!index.html'],
+        src: ['**/*.html', '!index.html'],
         dest: '.tmp/templates.js'
       }
     },
