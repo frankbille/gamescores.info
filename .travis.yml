@@ -22,6 +22,7 @@ install:
 script:
   - cd ${TRAVIS_BUILD_DIR}/$MODULE
 # Go App Engine build
+  - ${TRAVIS_BUILD_DIR}/go_appengine/goapp get -d ./src
   - ${TRAVIS_BUILD_DIR}/go_appengine/goapp build ./src
 # Nodejs/grunt build
   - node_modules/.bin/bower install
