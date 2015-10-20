@@ -6,7 +6,11 @@ go:
   - 1.4
 
 install:
-  - true
+  - cd ${TRAVIS_BUILD_DIR}/context && npm install
 
 script:
-  - true
+  - cd ${TRAVIS_BUILD_DIR}/context && node_modules/.bin/grunt
+
+cache:
+  directories:
+    - context/node_modules
