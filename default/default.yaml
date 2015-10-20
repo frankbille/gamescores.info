@@ -3,13 +3,8 @@ module: default
 api_version: go1
 runtime: go
 
-handlers:
-- url: /api/.*
-  script: _go_app
-
-- url: /.*
-  static_files: index.html
-  upload: index\.html
+include:
+- ../shared/production.yaml
 
 env_variables:
   GIN_MODE: "release"

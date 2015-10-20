@@ -3,32 +3,8 @@ module: context
 api_version: go1
 runtime: go
 
-handlers:
-- url: /api/.*
-  script: _go_app
-
-- url: /tasks/.*
-  script: _go_app
-  login: admin
-
-- url: /scripts
-  static_dir: dist/scripts
-
-- url: /styles
-  static_dir: dist/styles
-
-- url: /images
-  static_dir: dist/images
-
-- url: /.*
-  static_files: dist/index.html
-  upload: dist/index\.html
-
-skip_files:
-- node_modules
-- bower_components
-- .tmp
-- client
+include:
+- ../shared/production.yaml
 
 env_variables:
   GIN_MODE: "release"

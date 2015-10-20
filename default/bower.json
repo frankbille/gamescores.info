@@ -1,5 +1,5 @@
 {
-  "name": "gamescores.context",
+  "name": "gamescores.default",
   "version": "1.0.0",
   "dependencies": {
     "angular-material": "0.12.0-rc1",

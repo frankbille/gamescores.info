@@ -3,3 +3,5 @@ node_modules
 bower_components
 context/dist
 context/.tmp
+default/dist
+default/.tmp
