@@ -6,7 +6,7 @@ angular.module('GameScoresApp').factory('PlayerService', function ($http, $q) {
     return {
         getAllPlayers: function (reload) {
             var deferred = $q.defer();
-        console.log(reload);
+
             if (reload) {
                 playerMap = null;
             }
