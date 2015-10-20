@@ -3,7 +3,7 @@ module: context
 api_version: go1
 runtime: go
 
-include:
+includes:
 - ../shared/develop.yaml
 
 env_variables:
