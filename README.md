@@ -1,4 +1,4 @@
-# GameScores.info
+# GameScores.info [![Build Status](https://travis-ci.org/gamescores/gamescores.info.svg?branch=master)](https://travis-ci.org/gamescores/gamescores.info)
 
 GameScores.info is a web based system, to keep track of game results and player
 stats for small office games. It is initially designed to keep track of
