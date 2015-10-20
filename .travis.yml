@@ -5,15 +5,19 @@ sudo: false
 go:
   - 1.4
 
+env:
+  - MODULE=context
+  - MODULE=default
+
 install:
-  - cd ${TRAVIS_BUILD_DIR}/context && npm install
+  - cd ${TRAVIS_BUILD_DIR}/$MODULE && npm install
 
 script:
-  - cd ${TRAVIS_BUILD_DIR}/context
+  - cd ${TRAVIS_BUILD_DIR}/$MODULE
   - node_modules/.bin/bower install
   - node_modules/.bin/grunt
 
 cache:
   directories:
-    - context/node_modules
-    - context/bower_components
+    - $MODULE/node_modules
+    - $MODULE/bower_components
