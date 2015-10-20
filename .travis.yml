@@ -9,10 +9,11 @@ install:
   - cd ${TRAVIS_BUILD_DIR}/context && npm install
 
 script:
-  - cd ${TRAVIS_BUILD_DIR}/context \
-      && node_modules/.bin/bower install \
-      && node_modules/.bin/grunt
+  - cd ${TRAVIS_BUILD_DIR}/context && \
+      node_modules/.bin/bower install && \
+      node_modules/.bin/grunt
 
 cache:
   directories:
     - context/node_modules
+    - context/bower_components
