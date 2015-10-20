@@ -5,3 +5,4 @@ context/dist
 context/.tmp
 default/dist
 default/.tmp
+service-account.json
