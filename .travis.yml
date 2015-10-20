@@ -34,11 +34,11 @@ script:
 
 deploy:
   provider: gae
-  keyfile: "service-account.json"
+  keyfile: "${TRAVIS_BUILD_DIR}/service-account.json"
   default: false
   project: gamescores-info
   version: $TRAVIS_BRANCH
-  config: $MODULE/$MODULE.yaml
+  config: ${TRAVIS_BUILD_DIR}/$MODULE/$MODULE.yaml
 
 cache:
   directories:
