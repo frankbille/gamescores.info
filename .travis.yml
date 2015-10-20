@@ -15,15 +15,16 @@ install:
   - echo $FILE
   - curl -O https://storage.googleapis.com/appengine-sdks/featured/$FILE
   - unzip -q $FILE
+  - ls -l
 # Install for Nodejs/Grunt build
   - cd ${TRAVIS_BUILD_DIR}/$MODULE
   - npm install
 
 script:
-# Go App Engine build
-  - ./go_appengine/goapp build ./$MODULE
-# Nodejs/grunt build
   - cd ${TRAVIS_BUILD_DIR}/$MODULE
+# Go App Engine build
+  - ${TRAVIS_BUILD_DIR}/go_appengine/goapp build .
+# Nodejs/grunt build
   - node_modules/.bin/bower install
   - node_modules/.bin/grunt
 
