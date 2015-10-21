@@ -6,6 +6,7 @@ import (
 	http "net/http"
 	"os"
 	"strings"
+	"fmt"
 )
 
 const (
@@ -50,11 +51,17 @@ func gaeContext() gin.HandlerFunc {
 		namespace := ""
 
 		if productionDomain := os.Getenv("PRODUCTION_DOMAIN"); productionDomain != "" {
+			if strings.HasPrefix(productionDomain, ".") == false {
+				productionDomain = fmt.Sprintf(".%s", productionDomain);
+			}
+
 			lastIndex := strings.LastIndex(c.Request.Host, productionDomain)
 
 			if lastIndex > -1 {
 				namespace = strings.Replace(c.Request.Host, productionDomain, "", lastIndex)
 			}
+		} else if devNamespace := os.Getenv("DEV_NAMESPACE"); devNamespace != "" {
+			namespace = devNamespace
 		}
 
 		if namespace != "" {

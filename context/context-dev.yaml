@@ -6,4 +6,4 @@ includes:
 - ../shared/develop.yaml
 
 env_variables:
-  PRODUCTION_DOMAIN: "gamescores.info"
+  DEV_NAMESPACE: "devcontext"
