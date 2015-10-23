@@ -1,0 +1,4 @@
+/* I don't know why this is needed, but the icon on button doesn't align for some reason, if we don't do this.  */
+a.md-fab md-icon, a.md-icon-button md-icon {
+    height: auto;
+}

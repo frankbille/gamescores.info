@@ -1,23 +1,36 @@
 <html lang="en" ng-app="defaultapp">
 <head>
-  <base href="/">
-  <style>
-    [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
-      display: none !important;
-    }
-  </style>
-  <!-- build:css /styles/vendor.css -->
-  <!-- bower:css -->
-  <link rel="stylesheet" href="../bower_components/angular-material/angular-material.css" />
-  <!-- endbower -->
-  <!-- endbuild -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
-  <!-- build:css /styles/app.css -->
-  <link rel="stylesheet" href="styles/app.css" />
-  <!-- endbuild -->
-  <meta name="viewport" content="initial-scale=1" />
+    <base href="/">
+    <style>
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+            display: none !important;
+        }
+    </style>
+    <!-- build:css /styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="../bower_components/angular-material/angular-material.css"/>
+    <!-- endbower -->
+    <!-- endbuild -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
+    <!-- build:css /styles/app.css -->
+    <link rel="stylesheet" href="styles/app.css"/>
+    <!-- endbuild -->
+    <meta name="viewport" content="initial-scale=1"/>
 </head>
 <body ng-cloak layout="column" flex>
+
+<md-content class="md-primary md-hue-1" flex layout="row" layout-align="center center">
+    <md-card layout="column" flex-gt-lg="50" flex-gt-md="60" flex-gt-sm="70" flex-sm="100">
+        <md-card-content>
+            <h1 layout-padding class="md-display-3" hide show-gt-sm>GameScores</h1>
+
+            <h1 layout-padding class="md-display-1" hide show-sm>GameScores</h1>
+
+            <div ui-view></div>
+        </md-card-content>
+    </md-card>
+</md-content>
+
 
 <!-- build:js /scripts/vendor.js -->
 <!-- bower:js -->
@@ -32,6 +45,12 @@
 <!-- endbuild -->
 <!-- build:js /scripts/app.js -->
 <script src="app.js"></script>
+<script src="config/material.js"></script>
+<script src="config/routes.js"></script>
+<script src="services/contextdefinition.service.js"></script>
+<script src="services/user.service.js"></script>
+<script src="components/context/createcontext.ctrl.js"></script>
+<script src="components/login/login.ctrl.js"></script>
 <!-- endbuild -->
 </body>
 </html>
