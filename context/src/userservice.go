@@ -27,7 +27,7 @@ func (us userService) getCurrentUser(c *gin.Context) {
 }
 
 func (us userService) startLoginProcess(c *gin.Context) {
-	gaeCtx := getGaeContext(c)
+	gaeCtx := getGaeRootContext(c)
 
 	loginURL, err := appengineuser.LoginURL(gaeCtx, "")
 
@@ -46,7 +46,7 @@ func getCurrentUserFromGinContext(c *gin.Context) *User {
 
 func resolveUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		gaeCtx := getGaeContext(c)
+		gaeCtx := getGaeRootContext(c)
 		currentGaeUser := appengineuser.Current(gaeCtx)
 
 		var user *User
@@ -66,12 +66,16 @@ func resolveUser() gin.HandlerFunc {
 				user = &User{
 					UserID: currentGaeUser.ID,
 					Email:  currentGaeUser.Email,
-					Role:   Standard,
 				}
 				userDao.saveUser(user)
 			}
 
 			user.LoggedIn = true
+			if currentGaeUser.Admin {
+				user.Role = Admin
+			} else {
+				user.Role = Standard
+			}
 
 			logoutURL, _ := appengineuser.LogoutURL(gaeCtx, "")
 			user.AddLink(relLogout, logoutURL)

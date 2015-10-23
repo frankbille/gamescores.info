@@ -1,10 +1,10 @@
 package context
 
 const (
-	// Standard user. Can add and remove games
+	// Standard user. Can create contexts, and participate in them
 	Standard UserRole = "standard"
-	// Admin user. Can set up leages, change settings and make give other users
-	// admin rights.
+	// Admin user. Links to a app engine developer account (app engine admin)
+	// Used for cross context administration
 	Admin UserRole = "admin"
 
 	relLogin  RelType = "login"
@@ -18,11 +18,9 @@ type UserRole string
 type User struct {
 	DefaultHalResource
 	// The id from the appengine.user.User type
-	UserID        string   `json:"-"`
-	LoggedIn      bool     `json:"loggedIn" datastore:"-"`
-	Name          string   `json:"name,omitempty"`
-	Email         string   `json:"email"`
-	DefaultLeague int64    `json:"defaultLeague,omitempty"`
-	ClaimedPlayer int64    `json:"claimedPlayer,omitempty"`
-	Role          UserRole `json:"role"`
+	UserID   string   `json:"-"`
+	LoggedIn bool     `json:"loggedIn" datastore:"-"`
+	Name     string   `json:"name,omitempty"`
+	Email    string   `json:"email"`
+	Role     UserRole `json:"role" datastore:"-"`
 }

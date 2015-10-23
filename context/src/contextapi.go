@@ -2,15 +2,16 @@ package context
 
 import (
 	"appengine"
+	"fmt"
 	gin "github.com/gamescores/gin"
 	http "net/http"
 	"os"
 	"strings"
-	"fmt"
 )
 
 const (
-	gaeCtxKey = "GaeCtxKey"
+	gaeRootCtxKey = "GaeRootCtxKey"
+	gaeCtxKey     = "GaeCtxKey"
 )
 
 type restService interface {
@@ -46,13 +47,14 @@ func init() {
 
 func gaeContext() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		gaeCtx := appengine.NewContext(c.Request)
+		gaeRootCtx := appengine.NewContext(c.Request)
+		c.Set(gaeRootCtxKey, gaeRootCtx)
 
 		namespace := ""
 
 		if productionDomain := os.Getenv("PRODUCTION_DOMAIN"); productionDomain != "" {
 			if strings.HasPrefix(productionDomain, ".") == false {
-				productionDomain = fmt.Sprintf(".%s", productionDomain);
+				productionDomain = fmt.Sprintf(".%s", productionDomain)
 			}
 
 			lastIndex := strings.LastIndex(c.Request.Host, productionDomain)
@@ -64,21 +66,23 @@ func gaeContext() gin.HandlerFunc {
 			namespace = devNamespace
 		}
 
-		if namespace != "" {
-			gaeCtx.Debugf("Using namespace: \"%s\"", namespace)
-			nameSpacedGaeCtx, err := appengine.Namespace(gaeCtx, namespace)
-			if err != nil {
-				c.AbortWithError(500, err)
-				return
-			}
-			gaeCtx = nameSpacedGaeCtx
+		gaeRootCtx.Debugf("Using namespace: \"%s\"", namespace)
+		nameSpacedGaeCtx, err := appengine.Namespace(gaeRootCtx, namespace)
+		if err != nil {
+			c.AbortWithError(500, err)
+			return
 		}
 
-		c.Set(gaeCtxKey, gaeCtx)
+		c.Set(gaeCtxKey, nameSpacedGaeCtx)
 	}
 }
 
 func getGaeContext(c *gin.Context) appengine.Context {
 	gc := c.MustGet(gaeCtxKey)
+	return gc.(appengine.Context)
+}
+
+func getGaeRootContext(c *gin.Context) appengine.Context {
+	gc := c.MustGet(gaeRootCtxKey)
 	return gc.(appengine.Context)
 }
