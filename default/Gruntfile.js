@@ -7,6 +7,8 @@ module.exports = function (grunt) {
     // Load default config
     var config = require('../shared/gruntdefaultconfig');
 
+    config.ngtemplates.dist.options.module = 'defaultapp';
+
     grunt.initConfig(config);
 
     // Load shared tasks
