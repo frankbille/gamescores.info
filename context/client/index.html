@@ -32,10 +32,18 @@
           </md-menu-content>
         </md-menu>
         <md-button ui-sref="players">Players</md-button>
+        <md-menu ng-if="user.role == 'admin'">
+          <md-button ng-click="$mdOpenMenu($event)">Administration</md-button>
+          <md-menu-content width="4">
+            <md-menu-item>
+              <md-button ui-sref="adminimport">Import</md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
         <span flex></span>
         <md-button ng-hide="userLoading || user.loggedIn" ng-href="{{user._links.login.href}}" target="_self">Login</md-button>
         <md-button ng-show="user.loggedIn" ng-href="{{user._links.logout.href}}" target="_self">Logout</md-button>
-        <md-button aria-label="Avatar" ng-show="user.loggedIn" class="md-icon-button"><img gravatar-src="user.email" gravatar-size="30"></md-button>
+        <md-button aria-label="Avatar" ng-if="user.loggedIn" class="md-icon-button"><img gravatar-src="user.email" gravatar-size="30"></md-button>
 
         <md-button class="md-icon-button" aria-label="Help" ui-sref="about" ng-click="showAbout()">
           <md-icon md-svg-icon="action:help"></md-icon>
@@ -66,6 +74,7 @@
     <script src="services/league.service.js"></script>
     <script src="services/player.service.js"></script>
     <script src="services/game.service.js"></script>
+    <script src="services/import.service.js"></script>
     <script src="directives/infinite-scroll.directive.js"></script>
     <script src="components/menu/menu.ctrl.js"></script>
     <script src="components/games/gamelist.ctrl.js"></script>
@@ -75,6 +84,7 @@
     <script src="components/players/playerdialog.ctrl.js"></script>
     <script src="components/players/addplayerbutton.ctrl.js"></script>
     <script src="components/about/aboutdialog.ctrl.js"></script>
+    <script src="components/admin/import.ctrl.js"></script>
     <!-- endbuild -->
   </body>
 </html>

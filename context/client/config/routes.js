@@ -71,5 +71,14 @@ angular.module('GameScoresApp').config(function ($stateProvider,
             onEnter: function(AboutDialog) {
                 AboutDialog(event);
             }
+        })
+        .state('adminimport', {
+            url: '/admin/import',
+            views: {
+                main: {
+                    templateUrl: '/components/admin/import.html',
+                    controller: 'ImportCtrl'
+                }
+            }
         });
 });

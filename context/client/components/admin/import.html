@@ -1,0 +1,65 @@
+<div ng-if="!loading">
+    <div layout-margin ng-if="!importing">
+        <h1 class="md-display-1">Import data from ScoreBoard v1</h1>
+
+        <p>
+            You can override all existing data with a dump from a
+            <a href="http://github.com/frankbille/ScoreBoard">ScoreBoard v1</a> database. You create using this command:
+        </p>
+
+        <pre>
+            mysqldump --xml -h HOST -u USER DATABASE > dump.xml
+        </pre>
+
+        <p>
+            The dump must be hosted on a publicly available HTTP server. It may not be compressed and the file must not
+            be
+            larger than 32MB.
+        </p>
+
+        <md-toolbar class="md-warn">
+            <div class="md-toolbar-tools">
+                <h2 class="md-flex">WARNING! All existing players, leagues and games WILL BE DELETED</h2>
+            </div>
+        </md-toolbar>
+
+        <form name="importForm" layout="column">
+            <md-input-container>
+                <label>Database Dump URL</label>
+                <input name="dbDumpUrl" type="url" ng-model="importDefinition.dbDumpUrl">
+            </md-input-container>
+
+            <md-button ng-click="import()"
+                       ng-disabled="!importDefinition.dbDumpUrl || !importForm.dbDumpUrl.$valid"
+                       class="md-raised md-warn">
+                Import
+            </md-button>
+        </form>
+    </div>
+
+    <div layout-margin ng-if="importing">
+        <h1 class="md-display-1">Importing data from ScoreBoard v1</h1>
+
+        <md-progress-linear md-mode="determinate" value="{{progress}}"></md-progress-linear>
+
+        <p>
+            Players: {{importStatus.importedPlayerCount}}/{{importStatus.totalPlayerCount}}
+        </p>
+
+        <p>
+            Leagues: {{importStatus.importedLeagueCount}}/{{importStatus.totalLeagueCount}}
+        </p>
+
+        <p>
+            Games: {{importStatus.importedGameCount}}/{{importStatus.totalGameCount}}
+        </p>
+
+        <p ng-show="doneImporting">
+            Import complete!
+        </p>
+    </div>
+</div>
+
+<div ng-if="loading">
+    <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+</div>
