@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"fmt"
 )
 
 const (
@@ -57,6 +58,7 @@ func (as adminService) importScoreBoardV1(c *gin.Context) {
 		Payload: []byte(importDefinition.DbDumpUrl),
 	}
 	hostName, _ := appengine.ModuleHostname(getGaeRootContext(c), appengine.ModuleName(getGaeRootContext(c)), "", "")
+	hostName = fmt.Sprintf("%s-dot-%s", getNamespace(c), hostName)
 	createTask.Header = http.Header{
 		"Host": []string{hostName},
 	}
@@ -64,7 +66,7 @@ func (as adminService) importScoreBoardV1(c *gin.Context) {
 	_, err := taskqueue.Add(getGaeRootContext(c), createTask, "contextqueue")
 
 	if err != nil {
-		getGaeRootContext(c).Errorf("%v", err)
+		getGaeRootContext(c).Errorf("Error calling taskqueue.Add in importScoreBoardV1: %v", err)
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -73,7 +75,7 @@ func (as adminService) importScoreBoardV1(c *gin.Context) {
 	importStatus, err := importDao.setStatus(true, 0, 0, 0, 0, 0, 0)
 
 	if err != nil {
-		getGaeRootContext(c).Errorf("%v", err)
+		getGaeRootContext(c).Errorf("Error calling importDao.setStatus in importScoreBoardV1: %v", err)
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -104,10 +106,12 @@ func (as adminService) importScoreBoardV1Status(c *gin.Context) {
 }
 
 func (as adminService) doImportScoreBoardV1(c *gin.Context) {
+	importDao := createImportDao(c)
+
 	body, err := ioutil.ReadAll(c.Request.Body)
 
 	if err != nil {
-		getGaeRootContext(c).Errorf("%v", err)
+		getGaeRootContext(c).Errorf("Error calling ioutil.ReadAll(c.Request.Body) in doImportScoreBoardV1: %v", err)
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -117,10 +121,8 @@ func (as adminService) doImportScoreBoardV1(c *gin.Context) {
 	httpClient := urlfetch.Client(getGaeRootContext(c))
 	response, err := httpClient.Get(dbDumpUrl)
 
-	importDao := createImportDao(c)
-
 	if err != nil {
-		getGaeRootContext(c).Errorf("%v", err)
+		getGaeRootContext(c).Errorf("Error calling httpClient.Get in doImportScoreBoardV1: %v", err)
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -128,7 +130,7 @@ func (as adminService) doImportScoreBoardV1(c *gin.Context) {
 	data, err := ioutil.ReadAll(response.Body)
 
 	if err != nil {
-		getGaeRootContext(c).Errorf("%v", err)
+		getGaeRootContext(c).Errorf("Error calling ioutil.ReadAll(response.Body) in doImportScoreBoardV1: %v", err)
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -138,7 +140,7 @@ func (as adminService) doImportScoreBoardV1(c *gin.Context) {
 	err = xml.Unmarshal(data, &dump)
 
 	if err != nil {
-		getGaeRootContext(c).Errorf("%v", err)
+		getGaeRootContext(c).Errorf("Error calling xml.Unmarshal in doImportScoreBoardV1: %v", err)
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -157,7 +159,13 @@ func (as adminService) doImportScoreBoardV1(c *gin.Context) {
 	leagueCount := 0
 	gameTotal := len(gameTable.Rows)
 	gameCount := 0
-	importDao.setStatus(true, playerTotal, playerCount, leagueTotal, leagueCount, gameTotal, gameCount)
+	_, err = importDao.setStatus(true, playerTotal, playerCount, leagueTotal, leagueCount, gameTotal, gameCount)
+
+	if err != nil {
+		getGaeRootContext(c).Errorf("importDao.setStatus: %v", err)
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
 	// Add players first
 	as._deleteAll(entityPlayer, getGaeContext(c))
@@ -174,7 +182,7 @@ func (as adminService) doImportScoreBoardV1(c *gin.Context) {
 		})
 
 		if err != nil {
-			getGaeRootContext(c).Errorf("%v", err)
+			getGaeRootContext(c).Errorf("Error calling playerDao.savePlayer in doImportScoreBoardV1: %v", err)
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
@@ -182,7 +190,13 @@ func (as adminService) doImportScoreBoardV1(c *gin.Context) {
 		playerConvertIdMap[id] = savedPlayer.ID
 
 		playerCount++
-		importDao.setStatus(true, playerTotal, playerCount, leagueTotal, leagueCount, gameTotal, gameCount)
+		_, err = importDao.setStatus(true, playerTotal, playerCount, leagueTotal, leagueCount, gameTotal, gameCount)
+
+		if err != nil {
+			getGaeRootContext(c).Errorf("importDao.setStatus: %v", err)
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
 	}
 
 	// Add leagues
@@ -200,7 +214,7 @@ func (as adminService) doImportScoreBoardV1(c *gin.Context) {
 		})
 
 		if err != nil {
-			getGaeRootContext(c).Errorf("%v", err)
+			getGaeRootContext(c).Errorf("Error calling leagueDao.saveLeague in doImportScoreBoardV1: %v", err)
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
@@ -208,7 +222,13 @@ func (as adminService) doImportScoreBoardV1(c *gin.Context) {
 		leagueConvertIdMap[id] = savedLeague.ID
 
 		leagueCount++
-		importDao.setStatus(true, playerTotal, playerCount, leagueTotal, leagueCount, gameTotal, gameCount)
+		_, err = importDao.setStatus(true, playerTotal, playerCount, leagueTotal, leagueCount, gameTotal, gameCount)
+
+		if err != nil {
+			getGaeRootContext(c).Errorf("importDao.setStatus: %v", err)
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
 	}
 
 	// Add games
@@ -234,16 +254,28 @@ func (as adminService) doImportScoreBoardV1(c *gin.Context) {
 		_, err := gameDao.saveGame(game)
 
 		if err != nil {
-			getGaeRootContext(c).Errorf("%v", err)
+			getGaeRootContext(c).Errorf("Error calling gameDao.saveGame in doImportScoreBoardV1: %v", err)
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
 		gameCount++
-		importDao.setStatus(true, playerTotal, playerCount, leagueTotal, leagueCount, gameTotal, gameCount)
+		_, err = importDao.setStatus(true, playerTotal, playerCount, leagueTotal, leagueCount, gameTotal, gameCount)
+
+		if err != nil {
+			getGaeRootContext(c).Errorf("importDao.setStatus: %v", err)
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
 	}
 
-	importDao.setStatus(false, playerTotal, playerCount, leagueTotal, leagueCount, gameTotal, gameCount)
+	_, err = importDao.setStatus(false, playerTotal, playerCount, leagueTotal, leagueCount, gameTotal, gameCount)
+
+	if err != nil {
+		getGaeRootContext(c).Errorf("importDao.setStatus: %v", err)
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 }
 
 func (as adminService) _createTeam(idString string, gameTeamTable, teamPlayersTable map[string][]Row, playerConvertIdMap map[string]int64) GameTeam {
