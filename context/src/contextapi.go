@@ -73,15 +73,11 @@ func gaeContext() gin.HandlerFunc {
 		if namespace == "" {
 			requestHost := convertDots(c.Request.Host)
 			requestHost = strings.Replace(requestHost, "master.", ".", 1)
-			gaeRootCtx.Debugf("Request host: %s", requestHost)
 			hostName, _ := appengine.ModuleHostname(gaeRootCtx, appengine.ModuleName(gaeRootCtx), "master", "")
 			hostName = convertDots(hostName)
 			hostName = strings.Replace(hostName, "master.", ".", 1)
-			gaeRootCtx.Debugf("Hostname: %s", hostName)
 
 			lastIndex := strings.LastIndex(requestHost, hostName)
-
-			gaeRootCtx.Debugf("Last index: %d", lastIndex)
 
 			if lastIndex > -1 {
 				namespace = strings.Replace(requestHost, hostName, "", lastIndex)
