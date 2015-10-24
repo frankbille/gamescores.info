@@ -3,6 +3,7 @@ package context
 import (
 	appengineuser "appengine/user"
 	gin "github.com/gamescores/gin"
+	"appengine/datastore"
 )
 
 const (
@@ -71,7 +72,11 @@ func resolveUser() gin.HandlerFunc {
 			}
 
 			user.LoggedIn = true
-			if currentGaeUser.Admin {
+			contextDefinition := getGameContext(c)
+
+			userKey := datastore.NewKey(gaeCtx, entityUser, user.UserID, 0, nil)
+
+			if contextDefinition.isUserOwner(userKey) {
 				user.Role = Admin
 			} else {
 				user.Role = Standard

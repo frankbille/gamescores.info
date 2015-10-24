@@ -12,6 +12,7 @@ import (
 const (
 	gaeRootCtxKey = "GaeRootCtxKey"
 	gaeCtxKey     = "GaeCtxKey"
+	namespaceKey  = "Namespace"
 )
 
 type restService interface {
@@ -24,12 +25,14 @@ func init() {
 	root := r.Group("/")
 
 	root.Use(gaeContext())
+	root.Use(resolveGameContext())
 	root.Use(resolveUser())
 
 	api := root.Group("/api")
 
 	// Create list of services used
 	services := []restService{
+		createContextDefinitionService(),
 		createUserService(),
 		createPlayerService(),
 		createLeagueService(),
@@ -74,6 +77,7 @@ func gaeContext() gin.HandlerFunc {
 		}
 
 		c.Set(gaeCtxKey, nameSpacedGaeCtx)
+		c.Set(namespaceKey, namespace)
 	}
 }
 
@@ -85,4 +89,14 @@ func getGaeContext(c *gin.Context) appengine.Context {
 func getGaeRootContext(c *gin.Context) appengine.Context {
 	gc := c.MustGet(gaeRootCtxKey)
 	return gc.(appengine.Context)
+}
+
+func getNamespace(c *gin.Context) string {
+	gc := c.MustGet(namespaceKey)
+	return gc.(string)
+}
+
+func abortWithError(c *gin.Context, err error) {
+	getGaeRootContext(c).Errorf("Error: %v", err)
+	c.AbortWithError(500, err)
 }

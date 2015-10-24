@@ -1,5 +1,4 @@
 angular.module('GameScoresApp').controller('PlayerListCtrl', function ($scope, PlayerService, $state) {
-    console.log($state);
     PlayerService.getAllPlayers(true).then(function (playerMap) {
         $scope.players = [];
         angular.forEach(playerMap, function(player) {
