@@ -71,11 +71,12 @@ func gaeContext() gin.HandlerFunc {
 
 		// Still no namespace. Maybe the request is to the appspot domain
 		if namespace == "" {
-			hostName, _ := appengine.ModuleHostname(gaeRootCtx, appengine.ModuleName(gaeRootCtx), "", "")
-			gaeRootCtx.Debugf("Request host: %s", c.Request.Host)
-			gaeRootCtx.Debugf("Hostname 1: %s", hostName)
-			hostName = fmt.Sprintf("-dot-%s", hostName)
-			gaeRootCtx.Debugf("Hostname 2: %s", hostName)
+			requestHost := convertDots(c.Request.Host)
+			gaeRootCtx.Debugf("Request host: %s", requestHost)
+			hostName, _ := appengine.ModuleHostname(gaeRootCtx, appengine.ModuleName(gaeRootCtx), "master", "")
+			hostName = convertDots(hostName)
+			hostName = strings.Replace(hostName, "master.", ".", 1)
+			gaeRootCtx.Debugf("Hostname: %s", hostName)
 
 			lastIndex := strings.LastIndex(c.Request.Host, hostName)
 
@@ -97,6 +98,10 @@ func gaeContext() gin.HandlerFunc {
 		c.Set(gaeCtxKey, nameSpacedGaeCtx)
 		c.Set(namespaceKey, namespace)
 	}
+}
+
+func convertDots(hostName string) string {
+	return strings.Replace(hostName, "-dot-", ".", -1)
 }
 
 func getGaeContext(c *gin.Context) appengine.Context {
