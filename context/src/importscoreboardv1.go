@@ -59,6 +59,7 @@ func (as adminService) importScoreBoardV1(c *gin.Context) {
 	}
 	hostName, _ := appengine.ModuleHostname(getGaeRootContext(c), appengine.ModuleName(getGaeRootContext(c)), "", "")
 	hostName = fmt.Sprintf("%s-dot-%s", getNamespace(c), hostName)
+	getGaeRootContext(c).Infof("Hostname for task: %s", hostName)
 	createTask.Header = http.Header{
 		"Host": []string{hostName},
 	}
