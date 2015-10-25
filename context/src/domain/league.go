@@ -1,4 +1,4 @@
-package context
+package domain
 
 // League describes a grouping of games.
 type League struct {

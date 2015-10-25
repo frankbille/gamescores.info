@@ -15,3 +15,11 @@ indexes:
   properties:
   - name: GameDate
     direction: desc
+
+- kind: Game
+  ancestor: yes
+  properties:
+  - name: GameDate
+    direction: desc
+  - name: ID
+    direction: desc

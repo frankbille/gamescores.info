@@ -1,23 +1,25 @@
-package context
+package dao
 
 import (
 	datastore "appengine/datastore"
 	gin "github.com/gamescores/gin"
+	"src/domain"
+	"src/utils"
 )
 
 const entityImport string = "Import"
 
-type importDao struct {
+type ImportDao struct {
 	dao
 }
 
-func createImportDao(c *gin.Context) importDao {
-	dao := createDao(getGaeContext(c))
-	return importDao{dao}
+func CreateImportDao(c *gin.Context) ImportDao {
+	dao := createDao(utils.GetGaeContext(c))
+	return ImportDao{dao}
 }
 
-func (dao *importDao) getStatus() (*ScoreBoardV1ImportStatus, error) {
-	var importStatus ScoreBoardV1ImportStatus
+func (dao *ImportDao) GetStatus() (*domain.ScoreBoardV1ImportStatus, error) {
+	var importStatus domain.ScoreBoardV1ImportStatus
 
 	key := datastore.NewKey(dao.Context, entityImport, "", 1, nil)
 
@@ -30,15 +32,15 @@ func (dao *importDao) getStatus() (*ScoreBoardV1ImportStatus, error) {
 	return &importStatus, err
 }
 
-func (dao *importDao) setStatus(importing bool, playerTotal, playerCreated, leagueTotal, leagueCreated, gameTotal, gameCreated int) (*ScoreBoardV1ImportStatus, error) {
-	importStatus, err := dao.getStatus()
+func (dao *ImportDao) SetStatus(importing bool, playerTotal, playerCreated, leagueTotal, leagueCreated, gameTotal, gameCreated int) (*domain.ScoreBoardV1ImportStatus, error) {
+	importStatus, err := dao.GetStatus()
 
 	if err != nil {
 		return nil, err
 	}
 
 	if importStatus == nil {
-		importStatus = &ScoreBoardV1ImportStatus{}
+		importStatus = &domain.ScoreBoardV1ImportStatus{}
 	}
 
 	importStatus.Importing = importing

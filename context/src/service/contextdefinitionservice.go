@@ -1,7 +1,10 @@
-package context
+package service
 
 import (
 	gin "github.com/gamescores/gin"
+	"src/dao"
+	"src/domain"
+	"src/utils"
 )
 
 const (
@@ -11,7 +14,7 @@ const (
 type contextDefinitionService struct {
 }
 
-func createContextDefinitionService() contextDefinitionService {
+func CreateContextDefinitionService() contextDefinitionService {
 	return contextDefinitionService{}
 }
 
@@ -23,14 +26,14 @@ func (cds contextDefinitionService) getContext(c *gin.Context) {
 	c.JSON(200, getGameContext(c))
 }
 
-func resolveGameContext() gin.HandlerFunc {
+func ResolveGameContext() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		contextDefinitionDao := createContextDefinitionDao(c)
+		contextDefinitionDao := dao.CreateContextDefinitionDao(c)
 
-		contextDefinition, err := contextDefinitionDao.getContext(getNamespace(c))
+		contextDefinition, err := contextDefinitionDao.GetContext(utils.GetNamespace(c))
 
 		if err != nil {
-			abortWithError(c, err)
+			utils.AbortWithError(c, err)
 			return
 		}
 
@@ -38,7 +41,7 @@ func resolveGameContext() gin.HandlerFunc {
 	}
 }
 
-func getGameContext(c *gin.Context) *ContextDefinition {
+func getGameContext(c *gin.Context) *domain.ContextDefinition {
 	gc := c.MustGet(gameContextKey)
-	return gc.(*ContextDefinition)
+	return gc.(*domain.ContextDefinition)
 }

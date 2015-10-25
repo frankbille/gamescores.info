@@ -1,4 +1,4 @@
-package context
+package rest
 
 import (
 	"appengine"
@@ -7,18 +7,9 @@ import (
 	http "net/http"
 	"os"
 	"strings"
+	"src/service"
+	"src/utils"
 )
-
-const (
-	gaeRootCtxKey   = "GaeRootCtxKey"
-	gaeCtxKey       = "GaeCtxKey"
-	namespaceKey    = "Namespace"
-	namespaceHeader = "GameScoresNamespace"
-)
-
-type restService interface {
-	CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gin.RouterGroup)
-}
 
 func init() {
 	r := gin.New()
@@ -26,19 +17,19 @@ func init() {
 	root := r.Group("/")
 
 	root.Use(gaeContext())
-	root.Use(resolveGameContext())
-	root.Use(resolveUser())
+	root.Use(service.ResolveGameContext())
+	root.Use(service.ResolveUser())
 
 	api := root.Group("/api")
 
 	// Create list of services used
-	services := []restService{
-		createContextDefinitionService(),
-		createUserService(),
-		createPlayerService(),
-		createLeagueService(),
-		createGameService(),
-		createAdminService(),
+	services := []service.RestService{
+		service.CreateContextDefinitionService(),
+		service.CreateUserService(),
+		service.CreatePlayerService(),
+		service.CreateLeagueService(),
+		service.CreateGameService(),
+		service.CreateAdminService(),
 	}
 
 	// Process the services
@@ -52,7 +43,7 @@ func init() {
 func gaeContext() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		gaeRootCtx := appengine.NewContext(c.Request)
-		c.Set(gaeRootCtxKey, gaeRootCtx)
+		c.Set(utils.GaeRootCtxKey, gaeRootCtx)
 
 		namespace := ""
 
@@ -88,42 +79,22 @@ func gaeContext() gin.HandlerFunc {
 
 		// Still no namespace? Last resort is a custom header
 		if namespace == "" {
-			namespace = c.Request.Header.Get(namespaceHeader)
+			namespace = c.Request.Header.Get(service.NamespaceHeader)
 		}
 
 		gaeRootCtx.Debugf("Using namespace: \"%s\"", namespace)
 		nameSpacedGaeCtx, err := appengine.Namespace(gaeRootCtx, namespace)
 		if err != nil {
-			getGaeRootContext(c).Errorf("Error creating namespace: %v", err)
+			utils.GetGaeRootContext(c).Errorf("Error creating namespace: %v", err)
 			c.AbortWithError(500, err)
 			return
 		}
 
-		c.Set(gaeCtxKey, nameSpacedGaeCtx)
-		c.Set(namespaceKey, namespace)
+		c.Set(utils.GaeCtxKey, nameSpacedGaeCtx)
+		c.Set(utils.NamespaceKey, namespace)
 	}
 }
 
 func convertDots(hostName string) string {
 	return strings.Replace(hostName, "-dot-", ".", -1)
-}
-
-func getGaeContext(c *gin.Context) appengine.Context {
-	gc := c.MustGet(gaeCtxKey)
-	return gc.(appengine.Context)
-}
-
-func getGaeRootContext(c *gin.Context) appengine.Context {
-	gc := c.MustGet(gaeRootCtxKey)
-	return gc.(appengine.Context)
-}
-
-func getNamespace(c *gin.Context) string {
-	gc := c.MustGet(namespaceKey)
-	return gc.(string)
-}
-
-func abortWithError(c *gin.Context, err error) {
-	getGaeRootContext(c).Errorf("Error: %v", err)
-	c.AbortWithError(500, err)
 }
