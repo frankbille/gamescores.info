@@ -1,0 +1,28 @@
+<md-dialog aria-label="League Dialog" ng-cloak flex="50" flex-sm="100">
+    <form ng-submit="save()">
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>{{title}}</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <md-icon md-svg-icon="navigation:close" aria-label="Close dialog"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <md-input-container>
+                    <label>Name</label>
+                    <input ng-model="league.name" required ng-disabled="saving">
+                </md-input-container>
+
+                <md-checkbox ng-model="league.active" aria-label="Active" class="md-primary" ng-disabled="saving">
+                    Active
+                </md-checkbox>
+            </div>
+        </md-dialog-content>
+        <div class="md-actions">
+            <md-button class="md-primary">Save</md-button>
+        </div>
+    </form>
+</md-dialog>

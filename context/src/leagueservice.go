@@ -124,5 +124,9 @@ func addLeagueLinks(league *League, c *gin.Context) {
 
 	league.AddLink(relSelf, selfURL)
 
+	if isAuthenticated(c) {
+		league.AddLink(relUpdate, selfURL)
+	}
+
 	addLeagueGameLinks(league, c)
 }

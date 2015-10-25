@@ -7,10 +7,29 @@ angular.module('GameScoresApp').config(function ($stateProvider,
     // Now set up the states
     $stateProvider
         .state('leagues', {
-            url: '/leagues'
+            url: '/leagues',
+            views: {
+                main: {
+                    templateUrl: '/components/leagues/leaguelist.html',
+                    controller: 'LeagueListCtrl'
+                },
+                footer: {
+                    templateUrl: '/components/leagues/addleaguebutton.html',
+                    controller: 'AddLeagueButtonCtrl'
+                }
+            }
         })
-        .state('leagues.detail', {
-            url: '/{leagueId:int}'
+        .state('leagues.add', {
+            url: '/add',
+            onEnter: function(LeagueDialog) {
+                LeagueDialog(null, event);
+            }
+        })
+        .state('leagues.edit', {
+            url: '/{leagueId:int}',
+            onEnter: function($stateParams, LeagueDialog) {
+                LeagueDialog($stateParams.leagueId, event);
+            }
         })
         .state('games', {
             url: '/leagues/{leagueId:int}/games',

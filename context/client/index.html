@@ -24,14 +24,15 @@
           <span>Game Scores</span>
         </h2>
         <md-menu>
-          <md-button ng-click="$mdOpenMenu($event)">Leagues</md-button>
+          <md-button ng-click="$mdOpenMenu($event)">Daily</md-button>
           <md-menu-content width="4">
-            <md-menu-item ng-repeat="league in leagueList.leagues">
+            <md-menu-item ng-repeat="league in leagueList.leagues | orderBy:'name'">
               <md-button ui-sref="games({leagueId: league.id})">{{league.name}}</md-button>
             </md-menu-item>
           </md-menu-content>
         </md-menu>
         <md-button ui-sref="players">Players</md-button>
+        <md-button ui-sref="leagues">Leagues</md-button>
         <md-menu ng-if="user.role == 'admin'">
           <md-button ng-click="$mdOpenMenu($event)">Administration</md-button>
           <md-menu-content width="4">
@@ -83,6 +84,9 @@
     <script src="components/players/playerlist.ctrl.js"></script>
     <script src="components/players/playerdialog.ctrl.js"></script>
     <script src="components/players/addplayerbutton.ctrl.js"></script>
+    <script src="components/leagues/leaguelist.ctrl.js"></script>
+    <script src="components/leagues/leaguedialog.ctrl.js"></script>
+    <script src="components/leagues/addleaguebutton.ctrl.js"></script>
     <script src="components/about/aboutdialog.ctrl.js"></script>
     <script src="components/admin/import.ctrl.js"></script>
     <!-- endbuild -->
