@@ -6,7 +6,6 @@ import (
 	"appengine/taskqueue"
 	"appengine/urlfetch"
 	"encoding/xml"
-	"fmt"
 	"github.com/gamescores/gin"
 	"io/ioutil"
 	"net/http"
@@ -58,10 +57,9 @@ func (as adminService) importScoreBoardV1(c *gin.Context) {
 		Payload: []byte(importDefinition.DbDumpUrl),
 	}
 	hostName, _ := appengine.ModuleHostname(getGaeRootContext(c), appengine.ModuleName(getGaeRootContext(c)), "", "")
-	createTask.Header = http.Header{
-		"Host": []string{hostName},
-		namespaceHeader, getNamespace(c),
-	}
+	createTask.Header = http.Header{}
+	createTask.Header.Set("Host", hostName)
+	createTask.Header.Set(namespaceHeader, getNamespace(c))
 
 	_, err := taskqueue.Add(getGaeRootContext(c), createTask, "contextqueue")
 
