@@ -58,10 +58,9 @@ func (as adminService) importScoreBoardV1(c *gin.Context) {
 		Payload: []byte(importDefinition.DbDumpUrl),
 	}
 	hostName, _ := appengine.ModuleHostname(getGaeRootContext(c), appengine.ModuleName(getGaeRootContext(c)), "", "")
-	hostName = fmt.Sprintf("%s-dot-%s", getNamespace(c), hostName)
-	getGaeRootContext(c).Infof("Hostname for task: %s", hostName)
 	createTask.Header = http.Header{
 		"Host": []string{hostName},
+		namespaceHeader, getNamespace(c),
 	}
 
 	_, err := taskqueue.Add(getGaeRootContext(c), createTask, "contextqueue")
@@ -107,6 +106,8 @@ func (as adminService) importScoreBoardV1Status(c *gin.Context) {
 }
 
 func (as adminService) doImportScoreBoardV1(c *gin.Context) {
+	getGaeRootContext(c).Infof("%#v", c.Request)
+
 	importDao := createImportDao(c)
 
 	body, err := ioutil.ReadAll(c.Request.Body)

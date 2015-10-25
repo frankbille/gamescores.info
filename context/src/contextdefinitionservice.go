@@ -20,7 +20,7 @@ func (cds contextDefinitionService) CreateRoutes(parentRoute *gin.RouterGroup, r
 }
 
 func (cds contextDefinitionService) getContext(c *gin.Context) {
-
+	c.JSON(200, getGameContext(c))
 }
 
 func resolveGameContext() gin.HandlerFunc {

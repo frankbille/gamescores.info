@@ -10,9 +10,10 @@ import (
 )
 
 const (
-	gaeRootCtxKey = "GaeRootCtxKey"
-	gaeCtxKey     = "GaeCtxKey"
-	namespaceKey  = "Namespace"
+	gaeRootCtxKey   = "GaeRootCtxKey"
+	gaeCtxKey       = "GaeCtxKey"
+	namespaceKey    = "Namespace"
+	namespaceHeader = "GameScoresNamespace"
 )
 
 type restService interface {
@@ -73,19 +74,21 @@ func gaeContext() gin.HandlerFunc {
 		if namespace == "" {
 			requestHost := convertDots(c.Request.Host)
 			requestHost = strings.Replace(requestHost, "master.", "", 1)
-			gaeRootCtx.Debugf("Request host: %s", requestHost)
 			hostName, _ := appengine.ModuleHostname(gaeRootCtx, appengine.ModuleName(gaeRootCtx), "master", "")
 			hostName = convertDots(hostName)
 			hostName = strings.Replace(hostName, "master.", "", 1)
 			hostName = fmt.Sprintf(".%s", hostName)
-			gaeRootCtx.Debugf("Hostname: %s", hostName)
 
 			lastIndex := strings.LastIndex(requestHost, hostName)
-			gaeRootCtx.Debugf("Last index: %d", lastIndex)
 
 			if lastIndex > -1 {
 				namespace = strings.Replace(requestHost, hostName, "", lastIndex)
 			}
+		}
+
+		// Still no namespace? Last resort is a custom header
+		if namespace == "" {
+			namespace = c.Request.Header.Get(namespaceHeader)
 		}
 
 		gaeRootCtx.Debugf("Using namespace: \"%s\"", namespace)
