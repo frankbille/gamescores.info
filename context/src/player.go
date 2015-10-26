@@ -1,4 +1,4 @@
-package domain
+package context
 
 // Player describes the individual players. They are unique per context but
 // shared across all leagues and games in that context.

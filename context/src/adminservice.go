@@ -1,4 +1,4 @@
-package service
+package context
 
 import (
 	gin "github.com/gamescores/gin"
@@ -7,7 +7,7 @@ import (
 type adminService struct {
 }
 
-func CreateAdminService() adminService {
+func createAdminService() adminService {
 	return adminService{}
 }
 

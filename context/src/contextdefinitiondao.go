@@ -1,27 +1,25 @@
-package dao
+package context
 
 import (
 	datastore "appengine/datastore"
 	gin "github.com/gamescores/gin"
 	"appengine/memcache"
 	"fmt"
-	"src/domain"
-	"src/utils"
 )
 
 const entityContextDefinition string = "ContextDefinition"
 
-type ContextDefinitionDao struct {
+type contextDefinitionDao struct {
 	dao
 }
 
-func CreateContextDefinitionDao(c *gin.Context) ContextDefinitionDao {
-	dao := createDao(utils.GetGaeRootContext(c))
-	return ContextDefinitionDao{dao}
+func createContextDefinitionDao(c *gin.Context) contextDefinitionDao {
+	dao := createDao(getGaeRootContext(c))
+	return contextDefinitionDao{dao}
 }
 
-func (dao *ContextDefinitionDao) GetContext(namespace string) (*domain.ContextDefinition, error) {
-	var contextDefinition domain.ContextDefinition
+func (dao *contextDefinitionDao) getContext(namespace string) (*ContextDefinition, error) {
+	var contextDefinition ContextDefinition
 
 	memCacheKey := fmt.Sprintf("NameSpace-%s", namespace)
 

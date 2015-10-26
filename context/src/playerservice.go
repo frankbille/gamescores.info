@@ -1,23 +1,20 @@
-package service
+package context
 
 import (
 	"fmt"
 	gin "github.com/gamescores/gin"
 	"net/url"
 	"strconv"
-	"src/domain"
-	"src/dao"
-	"src/utils"
 )
 
 const (
-	relPlayerList domain.RelType = "playerlist"
+	relPlayerList RelType = "playerlist"
 )
 
 type playerService struct {
 }
 
-func CreatePlayerService() playerService {
+func createPlayerService() playerService {
 	return playerService{}
 }
 
@@ -44,45 +41,45 @@ func (ps playerService) handleGetAllPlayers(c *gin.Context) {
 	var recordsPerPage = 50
 	var start = getStartRecord(currentPage, recordsPerPage)
 
-	playerDao := dao.CreatePlayerDao(c)
+	playerDao := createPlayerDao(c)
 
-	playerArray, totalPlayerCount, err := playerDao.GetPlayers(start, recordsPerPage)
+	playerArray, totalPlayerCount, err := playerDao.getPlayers(start, recordsPerPage)
 
 	if err != nil {
-		utils.GetGaeContext(c).Errorf("Error loading players: %v", err)
+		getGaeContext(c).Errorf("Error loading players: %v", err)
 		c.AbortWithError(500, err)
 		return
 	}
 
 	if playerArray == nil {
-		playerArray = []domain.Player{}
+		playerArray = []Player{}
 	}
 
 	for index := range playerArray {
 		addPlayerLinks(&playerArray[index], c)
 	}
 
-	players := &domain.Players{
+	players := &Players{
 		Players: playerArray,
 	}
 
 	addPaginationLinks(players, "/api/players", currentPage, recordsPerPage, totalPlayerCount)
 	if isAuthenticated(c) {
-		players.AddLink(domain.RelCreate, "/api/players")
+		players.AddLink(relCreate, "/api/players")
 	}
 
 	c.JSON(200, players)
 }
 
 func (ps playerService) handleGetSpecificPlayers(c *gin.Context, idList []string) {
-	playerDao := dao.CreatePlayerDao(c)
+	playerDao := createPlayerDao(c)
 
 	playerIds := make([]int64, len(idList))
 	idx := 0
 	for _, id := range idList {
 		playerID, err := strconv.ParseInt(id, 10, 64)
 		if err != nil {
-			utils.GetGaeContext(c).Errorf("Not an integer: %v", err)
+			getGaeContext(c).Errorf("Not an integer: %v", err)
 			c.AbortWithError(500, err)
 			return
 		}
@@ -90,9 +87,9 @@ func (ps playerService) handleGetSpecificPlayers(c *gin.Context, idList []string
 		idx++
 	}
 
-	playerArray, err := playerDao.GetAllPlayersByID(playerIds)
+	playerArray, err := playerDao.getAllPlayersByID(playerIds)
 	if err != nil {
-		utils.GetGaeContext(c).Errorf("Error getting players by id: %v", err)
+		getGaeContext(c).Errorf("Error getting players by id: %v", err)
 		c.AbortWithError(500, err)
 		return
 	}
@@ -101,7 +98,7 @@ func (ps playerService) handleGetSpecificPlayers(c *gin.Context, idList []string
 		addPlayerLinks(&playerArray[index], c)
 	}
 
-	players := &domain.Players{
+	players := &Players{
 		Players: playerArray,
 	}
 
@@ -116,12 +113,12 @@ func (ps playerService) getPlayer(c *gin.Context) {
 		return
 	}
 
-	playerDao := dao.CreatePlayerDao(c)
+	playerDao := createPlayerDao(c)
 
-	player, err := playerDao.GetPlayer(playerID)
+	player, err := playerDao.getPlayer(playerID)
 
 	if err != nil {
-		utils.GetGaeContext(c).Errorf("Error loading player: %v", err)
+		getGaeContext(c).Errorf("Error loading player: %v", err)
 		c.AbortWithError(500, err)
 		return
 	}
@@ -131,7 +128,7 @@ func (ps playerService) getPlayer(c *gin.Context) {
 }
 
 func (ps playerService) createPlayer(c *gin.Context) {
-	var player domain.Player
+	var player Player
 
 	c.Bind(&player)
 
@@ -142,20 +139,20 @@ func (ps playerService) createPlayer(c *gin.Context) {
 }
 
 func (ps playerService) updatePlayer(c *gin.Context) {
-	var player domain.Player
+	var player Player
 
 	c.Bind(&player)
 
 	ps.doSavePlayer(player, c)
 }
 
-func (ps playerService) doSavePlayer(player domain.Player, c *gin.Context) {
-	playerDao := dao.CreatePlayerDao(c)
+func (ps playerService) doSavePlayer(player Player, c *gin.Context) {
+	playerDao := createPlayerDao(c)
 
-	savedPlayer, err := playerDao.SavePlayer(player)
+	savedPlayer, err := playerDao.savePlayer(player)
 
 	if err != nil {
-		utils.GetGaeContext(c).Errorf("Error saving player: %v", err)
+		getGaeContext(c).Errorf("Error saving player: %v", err)
 		c.AbortWithError(500, err)
 	}
 
@@ -173,21 +170,21 @@ func getPlayerIDFromURL(c *gin.Context) int64 {
 	return playerID
 }
 
-func addPlayerLinks(player *domain.Player, c *gin.Context) {
+func addPlayerLinks(player *Player, c *gin.Context) {
 	selfURL := fmt.Sprintf("/api/players/%d", player.ID)
 
-	player.AddLink(domain.RelSelf, selfURL)
+	player.AddLink(relSelf, selfURL)
 
 	if isAuthenticated(c) {
-		player.AddLink(domain.RelUpdate, selfURL)
+		player.AddLink(relUpdate, selfURL)
 	}
 }
 
-func addGetPlayerListByIDLinks(games *domain.Games, playerIds []int64, c *gin.Context) {
+func addGetPlayerListByIDLinks(games *Games, playerIds []int64, c *gin.Context) {
 	playerListURL, err := url.Parse("/api/players")
 
 	if err != nil {
-		utils.GetGaeContext(c).Errorf("Error parsing URL: %v", err)
+		getGaeContext(c).Errorf("Error parsing URL: %v", err)
 		c.AbortWithError(500, err)
 		return
 	}

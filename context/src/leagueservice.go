@@ -1,17 +1,15 @@
-package service
+package context
 
 import (
 	"fmt"
 	gin "github.com/gamescores/gin"
 	"strconv"
-	"src/dao"
-	"src/domain"
 )
 
 type leagueService struct {
 }
 
-func CreateLeagueService() leagueService {
+func createLeagueService() leagueService {
 	return leagueService{}
 }
 
@@ -28,9 +26,9 @@ func (ls leagueService) getLeagues(c *gin.Context) {
 	var recordsPerPage = 50
 	var start = getStartRecord(currentPage, recordsPerPage)
 
-	leagueDao := dao.CreateLeagueDao(c)
+	leagueDao := createLeagueDao(c)
 
-	leagueArray, totalLeagueCount, err := leagueDao.GetLeagues(start, recordsPerPage)
+	leagueArray, totalLeagueCount, err := leagueDao.getLeagues(start, recordsPerPage)
 
 	if err != nil {
 		c.AbortWithError(500, err)
@@ -38,21 +36,21 @@ func (ls leagueService) getLeagues(c *gin.Context) {
 	}
 
 	if leagueArray == nil {
-		leagueArray = []domain.League{}
+		leagueArray = []League{}
 	}
 
 	for index := range leagueArray {
 		addLeagueLinks(&leagueArray[index], c)
 	}
 
-	leagues := &domain.Leagues{
+	leagues := &Leagues{
 		Leagues: leagueArray,
 	}
 
 	addPaginationLinks(leagues, "/api/leagues", currentPage, recordsPerPage, totalLeagueCount)
 
 	if isAuthenticated(c) {
-		leagues.AddLink(domain.RelCreate, "/api/leagues")
+		leagues.AddLink(relCreate, "/api/leagues")
 	}
 
 	c.JSON(200, leagues)
@@ -66,9 +64,9 @@ func (ls leagueService) getLeague(c *gin.Context) {
 		return
 	}
 
-	leagueDao := dao.CreateLeagueDao(c)
+	leagueDao := createLeagueDao(c)
 
-	league, err := leagueDao.GetLeague(leagueID)
+	league, err := leagueDao.getLeague(leagueID)
 
 	if err != nil {
 		c.AbortWithError(500, err)
@@ -80,7 +78,7 @@ func (ls leagueService) getLeague(c *gin.Context) {
 }
 
 func (ls leagueService) createLeague(c *gin.Context) {
-	var league domain.League
+	var league League
 
 	c.Bind(&league)
 
@@ -91,17 +89,17 @@ func (ls leagueService) createLeague(c *gin.Context) {
 }
 
 func (ls leagueService) updateLeague(c *gin.Context) {
-	var league domain.League
+	var league League
 
 	c.Bind(&league)
 
 	ls.doSaveLeague(league, c)
 }
 
-func (ls leagueService) doSaveLeague(league domain.League, c *gin.Context) {
-	leagueDao := dao.CreateLeagueDao(c)
+func (ls leagueService) doSaveLeague(league League, c *gin.Context) {
+	leagueDao := createLeagueDao(c)
 
-	savedLeague, err := leagueDao.SaveLeague(league)
+	savedLeague, err := leagueDao.saveLeague(league)
 
 	if err != nil {
 		c.AbortWithError(500, err)
@@ -121,13 +119,13 @@ func getLeagueIDFromURL(c *gin.Context) int64 {
 	return leagueID
 }
 
-func addLeagueLinks(league *domain.League, c *gin.Context) {
+func addLeagueLinks(league *League, c *gin.Context) {
 	selfURL := fmt.Sprintf("/api/leagues/%d", league.ID)
 
-	league.AddLink(domain.RelSelf, selfURL)
+	league.AddLink(relSelf, selfURL)
 
 	if isAuthenticated(c) {
-		league.AddLink(domain.RelUpdate, selfURL)
+		league.AddLink(relUpdate, selfURL)
 	}
 
 	addLeagueGameLinks(league, c)

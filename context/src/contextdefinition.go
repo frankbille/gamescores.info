@@ -1,4 +1,4 @@
-package domain
+package context
 
 import (
 	"appengine/datastore"
@@ -12,6 +12,6 @@ type ContextDefinition struct {
 	Owner  *datastore.Key `json:"-"`
 }
 
-func (cd ContextDefinition) IsUserOwner(userKey *datastore.Key) bool {
+func (cd ContextDefinition) isUserOwner(userKey *datastore.Key) bool {
 	return userKey.Equal(cd.Owner)
 }

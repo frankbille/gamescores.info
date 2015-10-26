@@ -1,4 +1,4 @@
-package domain
+package context
 
 const (
 	// Standard user. Can create contexts, and participate in them
@@ -7,8 +7,8 @@ const (
 	// Used for cross context administration
 	Admin UserRole = "admin"
 
-	RelLogin  RelType = "login"
-	RelLogout RelType = "logout"
+	relLogin  RelType = "login"
+	relLogout RelType = "logout"
 )
 
 // UserRole is the type for the roles a user can have

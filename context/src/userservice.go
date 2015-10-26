@@ -1,12 +1,9 @@
-package service
+package context
 
 import (
 	appengineuser "appengine/user"
 	gin "github.com/gamescores/gin"
 	"appengine/datastore"
-	"src/domain"
-	"src/dao"
-	"src/utils"
 )
 
 const (
@@ -16,7 +13,7 @@ const (
 type userService struct {
 }
 
-func CreateUserService() userService {
+func createUserService() userService {
 	return userService{}
 }
 
@@ -31,7 +28,7 @@ func (us userService) getCurrentUser(c *gin.Context) {
 }
 
 func (us userService) startLoginProcess(c *gin.Context) {
-	gaeCtx := utils.GetGaeRootContext(c)
+	gaeCtx := getGaeRootContext(c)
 
 	loginURL, err := appengineuser.LoginURL(gaeCtx, "")
 
@@ -43,22 +40,23 @@ func (us userService) startLoginProcess(c *gin.Context) {
 	c.Redirect(302, loginURL)
 }
 
-func getCurrentUserFromGinContext(c *gin.Context) *domain.User {
+func getCurrentUserFromGinContext(c *gin.Context) *User {
 	usr := c.MustGet(userKey)
-	return usr.(*domain.User)
+	return usr.(*User)
 }
 
-func ResolveUser() gin.HandlerFunc {
+func resolveUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		gaeCtx := utils.GetGaeRootContext(c)
+		gaeCtx := getGaeRootContext(c)
 		currentGaeUser := appengineuser.Current(gaeCtx)
 
-		var user *domain.User
+		var user *User
 		if currentGaeUser != nil {
-			userDao := dao.CreateUserDao(c)
+			dao := createDao(gaeCtx)
+			userDao := userDao{dao}
 
 			var err error
-			user, err = userDao.GetUserByID(currentGaeUser.ID)
+			user, err = userDao.getUserByID(currentGaeUser.ID)
 
 			if err != nil {
 				c.AbortWithError(500, err)
@@ -66,32 +64,32 @@ func ResolveUser() gin.HandlerFunc {
 			}
 
 			if user == nil {
-				user = &domain.User{
+				user = &User{
 					UserID: currentGaeUser.ID,
 					Email:  currentGaeUser.Email,
 				}
-				userDao.SaveUser(user)
+				userDao.saveUser(user)
 			}
 
 			user.LoggedIn = true
 			contextDefinition := getGameContext(c)
 
-			userKey := datastore.NewKey(gaeCtx, dao.EntityUser, user.UserID, 0, nil)
+			userKey := datastore.NewKey(gaeCtx, entityUser, user.UserID, 0, nil)
 
-			if contextDefinition.IsUserOwner(userKey) {
-				user.Role = domain.Admin
+			if contextDefinition.isUserOwner(userKey) {
+				user.Role = Admin
 			} else {
-				user.Role = domain.Standard
+				user.Role = Standard
 			}
 
 			logoutURL, _ := appengineuser.LogoutURL(gaeCtx, "")
-			user.AddLink(domain.RelLogout, logoutURL)
+			user.AddLink(relLogout, logoutURL)
 		} else {
-			user = &domain.User{
+			user = &User{
 				LoggedIn: false,
 			}
 
-			user.AddLink(domain.RelLogin, "/api/login")
+			user.AddLink(relLogin, "/api/login")
 		}
 
 		c.Set(userKey, user)
@@ -126,7 +124,7 @@ func isAuthenticated(c *gin.Context) bool {
 func isAdmin(c *gin.Context) bool {
 	if isAuthenticated(c) {
 		user := getCurrentUserFromGinContext(c)
-		return user.Role == domain.Admin
+		return user.Role == Admin
 	}
 	return false
 }
