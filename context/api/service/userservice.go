@@ -1,12 +1,12 @@
 package service
 
 import (
+	"api/dao"
+	"api/domain"
+	"api/utils"
+	"appengine/datastore"
 	appengineuser "appengine/user"
 	gin "github.com/gamescores/gin"
-	"appengine/datastore"
-	"api/utils"
-	"api/domain"
-	"api/dao"
 )
 
 const (

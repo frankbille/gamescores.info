@@ -1,6 +1,9 @@
 package service
 
 import (
+	"api/dao"
+	"api/domain"
+	"api/utils"
 	"appengine"
 	"appengine/datastore"
 	"appengine/taskqueue"
@@ -11,9 +14,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-	"api/domain"
-	"api/utils"
-	"api/dao"
 )
 
 const (

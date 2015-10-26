@@ -2,16 +2,16 @@ package utils
 
 import (
 	"appengine"
+	"fmt"
 	"github.com/gamescores/gin"
 	"os"
 	"strings"
-	"fmt"
 )
 
 const (
-	gaeRootCtxKey = "GaeRootCtxKey"
-	gaeCtxKey     = "GaeCtxKey"
-	namespaceKey  = "Namespace"
+	gaeRootCtxKey   = "GaeRootCtxKey"
+	gaeCtxKey       = "GaeCtxKey"
+	namespaceKey    = "Namespace"
 	NamespaceHeader = "GameScoresNamespace"
 )
 

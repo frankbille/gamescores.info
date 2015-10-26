@@ -1,10 +1,10 @@
 package service
 
 import (
-	gin "github.com/gamescores/gin"
 	"api/dao"
-	"api/utils"
 	"api/domain"
+	"api/utils"
+	gin "github.com/gamescores/gin"
 )
 
 const (
