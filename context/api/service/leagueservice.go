@@ -1,11 +1,11 @@
 package service
 
 import (
+	"api/dao"
+	"api/domain"
 	"fmt"
 	gin "github.com/gamescores/gin"
 	"strconv"
-	"api/dao"
-	"api/domain"
 )
 
 type LeagueService struct {

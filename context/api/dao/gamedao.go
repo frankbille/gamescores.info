@@ -1,10 +1,10 @@
 package dao
 
 import (
+	"api/domain"
+	"api/utils"
 	datastore "appengine/datastore"
 	gin "github.com/gamescores/gin"
-	"api/utils"
-	"api/domain"
 )
 
 const EntityGame string = "Game"

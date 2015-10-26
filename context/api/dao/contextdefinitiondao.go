@@ -1,12 +1,12 @@
 package dao
 
 import (
+	"api/domain"
+	"api/utils"
 	datastore "appengine/datastore"
-	gin "github.com/gamescores/gin"
 	"appengine/memcache"
 	"fmt"
-	"api/utils"
-	"api/domain"
+	gin "github.com/gamescores/gin"
 )
 
 const entityContextDefinition string = "ContextDefinition"
@@ -34,7 +34,7 @@ func (dao *ContextDefinitionDao) GetContext(namespace string) (*domain.ContextDe
 
 		if err == nil {
 			memcache.Gob.Set(dao.Context, &memcache.Item{
-				Key: memCacheKey,
+				Key:    memCacheKey,
 				Object: contextDefinition,
 			})
 		}
