@@ -1,14 +1,14 @@
-package context
+package domain
 
 const (
-	relSelf   RelType = "self"
-	relCreate RelType = "create"
-	relUpdate RelType = "update"
-	relDelete RelType = "delete"
-	relNext   RelType = "next"
-	relPrev   RelType = "prev"
-	relFirst  RelType = "first"
-	relLast   RelType = "last"
+	RelSelf   RelType = "self"
+	RelCreate RelType = "create"
+	RelUpdate RelType = "update"
+	RelDelete RelType = "delete"
+	RelNext   RelType = "next"
+	RelPrev   RelType = "prev"
+	RelFirst  RelType = "first"
+	RelLast   RelType = "last"
 )
 
 // RelType is the type of the relation

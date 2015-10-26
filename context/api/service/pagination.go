@@ -1,13 +1,14 @@
-package context
+package service
 
 import (
+	"api/domain"
 	"fmt"
 	gin "github.com/gamescores/gin"
 	"math"
 	"strconv"
 )
 
-func addPaginationLinks(halResource HalResource, baseURL string, currentPage, recordsPerPage, totalRecordCount int) {
+func addPaginationLinks(halResource domain.HalResource, baseURL string, currentPage, recordsPerPage, totalRecordCount int) {
 	var firstPage = 1
 
 	var lastPage = int(math.Ceil(float64(totalRecordCount) / float64(recordsPerPage)))
@@ -18,17 +19,17 @@ func addPaginationLinks(halResource HalResource, baseURL string, currentPage, re
 	var prevPage = currentPage - 1
 	var nextPage = currentPage + 1
 
-	halResource.AddLink(relSelf, generatePaginationURL(baseURL, currentPage))
+	halResource.AddLink(domain.RelSelf, generatePaginationURL(baseURL, currentPage))
 
 	if firstPage != lastPage {
-		halResource.AddLink(relFirst, generatePaginationURL(baseURL, firstPage))
-		halResource.AddLink(relLast, generatePaginationURL(baseURL, lastPage))
+		halResource.AddLink(domain.RelFirst, generatePaginationURL(baseURL, firstPage))
+		halResource.AddLink(domain.RelLast, generatePaginationURL(baseURL, lastPage))
 	}
 	if prevPage >= firstPage && prevPage < lastPage {
-		halResource.AddLink(relPrev, generatePaginationURL(baseURL, prevPage))
+		halResource.AddLink(domain.RelPrev, generatePaginationURL(baseURL, prevPage))
 	}
 	if nextPage <= lastPage {
-		halResource.AddLink(relNext, generatePaginationURL(baseURL, nextPage))
+		halResource.AddLink(domain.RelNext, generatePaginationURL(baseURL, nextPage))
 	}
 }
 

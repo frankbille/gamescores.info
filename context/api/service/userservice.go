@@ -1,34 +1,37 @@
-package context
+package service
 
 import (
 	appengineuser "appengine/user"
 	gin "github.com/gamescores/gin"
 	"appengine/datastore"
+	"api/utils"
+	"api/domain"
+	"api/dao"
 )
 
 const (
 	userKey = "user"
 )
 
-type userService struct {
+type UserService struct {
 }
 
-func createUserService() userService {
-	return userService{}
+func CreateUserService() UserService {
+	return UserService{}
 }
 
-func (us userService) CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gin.RouterGroup) {
+func (us UserService) CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gin.RouterGroup) {
 	parentRoute.GET("/me", us.getCurrentUser)
 	parentRoute.GET("/login", us.startLoginProcess)
 }
 
-func (us userService) getCurrentUser(c *gin.Context) {
+func (us UserService) getCurrentUser(c *gin.Context) {
 	user := getCurrentUserFromGinContext(c)
 	c.JSON(200, user)
 }
 
-func (us userService) startLoginProcess(c *gin.Context) {
-	gaeCtx := getGaeRootContext(c)
+func (us UserService) startLoginProcess(c *gin.Context) {
+	gaeCtx := utils.GetGaeRootContext(c)
 
 	loginURL, err := appengineuser.LoginURL(gaeCtx, "")
 
@@ -40,23 +43,22 @@ func (us userService) startLoginProcess(c *gin.Context) {
 	c.Redirect(302, loginURL)
 }
 
-func getCurrentUserFromGinContext(c *gin.Context) *User {
+func getCurrentUserFromGinContext(c *gin.Context) *domain.User {
 	usr := c.MustGet(userKey)
-	return usr.(*User)
+	return usr.(*domain.User)
 }
 
-func resolveUser() gin.HandlerFunc {
+func ResolveUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		gaeCtx := getGaeRootContext(c)
+		gaeCtx := utils.GetGaeRootContext(c)
 		currentGaeUser := appengineuser.Current(gaeCtx)
 
-		var user *User
+		var user *domain.User
 		if currentGaeUser != nil {
-			dao := createDao(gaeCtx)
-			userDao := userDao{dao}
+			userDao := dao.CreateUserDao(c)
 
 			var err error
-			user, err = userDao.getUserByID(currentGaeUser.ID)
+			user, err = userDao.GetUserByID(currentGaeUser.ID)
 
 			if err != nil {
 				c.AbortWithError(500, err)
@@ -64,32 +66,32 @@ func resolveUser() gin.HandlerFunc {
 			}
 
 			if user == nil {
-				user = &User{
+				user = &domain.User{
 					UserID: currentGaeUser.ID,
 					Email:  currentGaeUser.Email,
 				}
-				userDao.saveUser(user)
+				userDao.SaveUser(user)
 			}
 
 			user.LoggedIn = true
-			contextDefinition := getGameContext(c)
+			contextDefinition := GetGameContext(c)
 
-			userKey := datastore.NewKey(gaeCtx, entityUser, user.UserID, 0, nil)
+			userKey := datastore.NewKey(gaeCtx, dao.EntityUser, user.UserID, 0, nil)
 
-			if contextDefinition.isUserOwner(userKey) {
-				user.Role = Admin
+			if contextDefinition.IsUserOwner(userKey) {
+				user.Role = domain.Admin
 			} else {
-				user.Role = Standard
+				user.Role = domain.Standard
 			}
 
 			logoutURL, _ := appengineuser.LogoutURL(gaeCtx, "")
-			user.AddLink(relLogout, logoutURL)
+			user.AddLink(domain.RelLogout, logoutURL)
 		} else {
-			user = &User{
+			user = &domain.User{
 				LoggedIn: false,
 			}
 
-			user.AddLink(relLogin, "/api/login")
+			user.AddLink(domain.RelLogin, "/api/login")
 		}
 
 		c.Set(userKey, user)
@@ -124,7 +126,7 @@ func isAuthenticated(c *gin.Context) bool {
 func isAdmin(c *gin.Context) bool {
 	if isAuthenticated(c) {
 		user := getCurrentUserFromGinContext(c)
-		return user.Role == Admin
+		return user.Role == domain.Admin
 	}
 	return false
 }

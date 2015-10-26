@@ -23,7 +23,10 @@ script:
   - cd ${TRAVIS_BUILD_DIR}/$MODULE
 # Go App Engine build
   - ${TRAVIS_BUILD_DIR}/go_appengine/goapp get -d ./src
-  - ${TRAVIS_BUILD_DIR}/go_appengine/goapp build ./src
+# goapp build doesn't build the same way as goapp serve and goapp deploy. So for now just deploy the code. That will
+# compile as well. If anyone wants to improve then maybe look into go-app-builder, which is being used when goapp serve
+# is being used.
+#  - ${TRAVIS_BUILD_DIR}/go_appengine/goapp build ./src
 # Nodejs/grunt build
   - node_modules/.bin/bower install
   - node_modules/.bin/grunt

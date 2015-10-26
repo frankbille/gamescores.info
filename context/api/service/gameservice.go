@@ -1,24 +1,27 @@
-package context
+package service
 
 import (
 	"fmt"
 	gin "github.com/gamescores/gin"
 	"strconv"
+	"api/domain"
+	"api/dao"
+	"api/utils"
 )
 
 const (
-	relCreateGame RelType = "creategame"
-	relGames      RelType = "games"
+	relCreateGame domain.RelType = "creategame"
+	relGames      domain.RelType = "games"
 )
 
-type gameService struct {
+type GameService struct {
 }
 
-func createGameService() gameService {
-	return gameService{}
+func CreateGameService() GameService {
+	return GameService{}
 }
 
-func (gs gameService) CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gin.RouterGroup) {
+func (gs GameService) CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gin.RouterGroup) {
 	games := parentRoute.Group("/leagues/:leagueId/games")
 	games.GET("", gs.getGames)
 	games.POST("", mustBeAuthenticated(), gs.createGame)
@@ -26,7 +29,7 @@ func (gs gameService) CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gin.
 	games.POST("/:gameId", mustBeAuthenticated(), gs.updateGame)
 }
 
-func (gs gameService) getGames(c *gin.Context) {
+func (gs GameService) getGames(c *gin.Context) {
 	leagueID := getLeagueIDFromURL(c)
 
 	if leagueID <= 0 {
@@ -38,25 +41,25 @@ func (gs gameService) getGames(c *gin.Context) {
 	recordsPerPage := 50
 	start := getStartRecord(currentPage, recordsPerPage)
 
-	gameDao := createGameDao(c)
+	gameDao := dao.CreateGameDao(c)
 
-	gameArray, totalGameCount, err := gameDao.getGames(start, recordsPerPage, leagueID)
+	gameArray, totalGameCount, err := gameDao.GetGames(start, recordsPerPage, leagueID)
 
 	if err != nil {
-		getGaeContext(c).Errorf("Error loading games: %v", err)
+		utils.GetGaeContext(c).Errorf("Error loading games: %v", err)
 		c.AbortWithError(500, err)
 		return
 	}
 
 	if gameArray == nil {
-		gameArray = []Game{}
+		gameArray = []domain.Game{}
 	}
 
 	for index := range gameArray {
 		gs.addGameLinks(leagueID, &gameArray[index], c)
 	}
 
-	games := &Games{
+	games := &domain.Games{
 		Games: gameArray,
 		Total: totalGameCount,
 	}
@@ -66,7 +69,7 @@ func (gs gameService) getGames(c *gin.Context) {
 	c.JSON(200, games)
 }
 
-func (gs gameService) getGame(c *gin.Context) {
+func (gs GameService) getGame(c *gin.Context) {
 	leagueID := getLeagueIDFromURL(c)
 
 	if leagueID <= 0 {
@@ -81,12 +84,12 @@ func (gs gameService) getGame(c *gin.Context) {
 		return
 	}
 
-	gameDao := createGameDao(c)
+	gameDao := dao.CreateGameDao(c)
 
-	game, err := gameDao.getGame(leagueID, gameID)
+	game, err := gameDao.GetGame(leagueID, gameID)
 
 	if err != nil {
-		getGaeContext(c).Errorf("Error loading game: %v", err)
+		utils.GetGaeContext(c).Errorf("Error loading game: %v", err)
 		c.AbortWithError(500, err)
 		return
 	}
@@ -95,10 +98,10 @@ func (gs gameService) getGame(c *gin.Context) {
 	c.JSON(200, game)
 }
 
-func (gs gameService) createGame(c *gin.Context) {
+func (gs GameService) createGame(c *gin.Context) {
 	leagueID := getLeagueIDFromURL(c)
 
-	var game Game
+	var game domain.Game
 
 	c.Bind(&game)
 
@@ -108,21 +111,21 @@ func (gs gameService) createGame(c *gin.Context) {
 	gs.doSaveGame(game, c)
 }
 
-func (gs gameService) updateGame(c *gin.Context) {
-	var game Game
+func (gs GameService) updateGame(c *gin.Context) {
+	var game domain.Game
 
 	c.Bind(&game)
 
 	gs.doSaveGame(game, c)
 }
 
-func (gs gameService) doSaveGame(game Game, c *gin.Context) {
-	gameDao := createGameDao(c)
+func (gs GameService) doSaveGame(game domain.Game, c *gin.Context) {
+	gameDao := dao.CreateGameDao(c)
 
-	savedGame, err := gameDao.saveGame(game)
+	savedGame, err := gameDao.SaveGame(game)
 
 	if err != nil {
-		getGaeContext(c).Errorf("Error saving game: %v", err)
+		utils.GetGaeContext(c).Errorf("Error saving game: %v", err)
 		c.AbortWithError(500, err)
 	}
 
@@ -130,25 +133,25 @@ func (gs gameService) doSaveGame(game Game, c *gin.Context) {
 	c.JSON(200, savedGame)
 }
 
-func (gs gameService) addGameLinks(leagueID int64, game *Game, c *gin.Context) {
+func (gs GameService) addGameLinks(leagueID int64, game *domain.Game, c *gin.Context) {
 	gameURL := fmt.Sprintf("/api/leagues/%d/games/%d", leagueID, game.ID)
 
-	game.AddLink(relSelf, gameURL)
+	game.AddLink(domain.RelSelf, gameURL)
 
 	if isAuthenticated(c) {
-		game.AddLink(relUpdate, gameURL)
+		game.AddLink(domain.RelUpdate, gameURL)
 	}
 }
 
-func (gs gameService) addGamesLinks(games *Games, leagueID int64, currentPage, recordsPerPage, totalGameCount int, c *gin.Context) {
+func (gs GameService) addGamesLinks(games *domain.Games, leagueID int64, currentPage, recordsPerPage, totalGameCount int, c *gin.Context) {
 	gamesURL := fmt.Sprintf("/api/leagues/%d/games", leagueID)
 	addPaginationLinks(games, gamesURL, currentPage, recordsPerPage, totalGameCount)
 	if isAuthenticated(c) {
-		games.AddLink(relCreate, gamesURL)
+		games.AddLink(domain.RelCreate, gamesURL)
 	}
 
 	// Create a unique list of player id's from all the games returned
-	playerIDSet := NewInt64Set()
+	playerIDSet := utils.NewInt64Set()
 	for _, game := range games.Games {
 		gs.addPlayerIdsFromGameTeam(playerIDSet, game.Team1)
 		gs.addPlayerIdsFromGameTeam(playerIDSet, game.Team2)
@@ -156,13 +159,13 @@ func (gs gameService) addGamesLinks(games *Games, leagueID int64, currentPage, r
 	addGetPlayerListByIDLinks(games, playerIDSet.Values(), c)
 }
 
-func (gs gameService) addPlayerIdsFromGameTeam(playerIDSet *Int64Set, gameTeam GameTeam) {
+func (gs GameService) addPlayerIdsFromGameTeam(playerIDSet *utils.Int64Set, gameTeam domain.GameTeam) {
 	for _, playerID := range gameTeam.Players {
 		playerIDSet.Add(playerID)
 	}
 }
 
-func addLeagueGameLinks(league *League, c *gin.Context) {
+func addLeagueGameLinks(league *domain.League, c *gin.Context) {
 	gamesURL := fmt.Sprintf("/api/leagues/%d/games", league.ID)
 	league.AddLink(relGames, gamesURL)
 

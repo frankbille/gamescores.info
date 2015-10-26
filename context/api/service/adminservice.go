@@ -1,17 +1,17 @@
-package context
+package service
 
 import (
 	gin "github.com/gamescores/gin"
 )
 
-type adminService struct {
+type AdminService struct {
 }
 
-func createAdminService() adminService {
-	return adminService{}
+func CreateAdminService() AdminService {
+	return AdminService{}
 }
 
-func (as adminService) CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gin.RouterGroup) {
+func (as AdminService) CreateRoutes(parentRoute *gin.RouterGroup, rootRoute *gin.RouterGroup) {
 	adminRoute := parentRoute.Group("/admin")
 
 	importRoute := adminRoute.Group("/import")
