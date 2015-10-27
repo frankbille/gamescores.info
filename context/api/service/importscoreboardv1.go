@@ -304,11 +304,11 @@ func (as AdminService) _createLookupMap(table *TableData, keyFieldName string) m
 	return lookupMap
 }
 
-func (as AdminService) _getFieldIntValueByName(row Row, fieldName string) int {
+func (as AdminService) _getFieldIntValueByName(row Row, fieldName string) int32 {
 	valueString := as._getFieldValueByName(row, fieldName)
 	if valueString != "" {
-		value, _ := strconv.ParseInt(valueString, 10, 0)
-		return int(value)
+		value, _ := strconv.ParseInt(valueString, 10, 32)
+		return int32(value)
 	}
 	return 0
 }

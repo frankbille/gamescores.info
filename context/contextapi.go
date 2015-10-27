@@ -29,6 +29,7 @@ func init() {
 		service.CreatePlayerService(),
 		service.CreateLeagueService(),
 		service.CreateGameService(),
+		service.CreateRatingService(),
 		service.CreateAdminService(),
 	}
 
