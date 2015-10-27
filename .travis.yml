@@ -32,4 +32,4 @@ script:
   - node_modules/.bin/grunt
 
 after_success:
-  - [ "${TRAVIS_PULL_REQUEST}" = "false" ] ${TRAVIS_BUILD_DIR}/go_appengine/appcfg.py --oauth2_refresh_token=$OAUTH2_REFRESH_TOKEN --oauth2_client_id=$OAUTH2_CLIENT_ID --oauth2_client_secret=$OAUTH2_CLIENT_SECRET update -V $TRAVIS_BRANCH -A gamescores-info ${TRAVIS_BUILD_DIR}/$MODULE/$MODULE.yaml'
+  - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] ${TRAVIS_BUILD_DIR}/go_appengine/appcfg.py --oauth2_refresh_token=$OAUTH2_REFRESH_TOKEN --oauth2_client_id=$OAUTH2_CLIENT_ID --oauth2_client_secret=$OAUTH2_CLIENT_SECRET update -V $TRAVIS_BRANCH -A gamescores-info ${TRAVIS_BUILD_DIR}/$MODULE/$MODULE.yaml'
