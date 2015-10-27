@@ -3,7 +3,7 @@ package utils
 import (
 	"appengine"
 	"fmt"
-	"github.com/gamescores/gin"
+	gin "github.com/gamescores/gin"
 	"os"
 	"strings"
 )
