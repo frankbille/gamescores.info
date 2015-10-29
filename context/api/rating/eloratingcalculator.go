@@ -21,7 +21,7 @@ func CreateEloRatingCalculator() *EloRatingCalculator {
 	}
 }
 
-func (erc *EloRatingCalculator) CalculateRating(previousGameRating domain.GameRating, previousPlayerRatings []domain.PlayerRating, currentGame domain.Game) domain.GameRating {
+func (erc *EloRatingCalculator) CalculateRating(latestPlayerRatings map[int64]domain.PlayerRating, currentGame domain.Game) domain.GameRating {
 	// Find winning and losing team
 	var winner, looser domain.GameTeam
 	if currentGame.Team1.Score > currentGame.Team2.Score {
@@ -32,16 +32,19 @@ func (erc *EloRatingCalculator) CalculateRating(previousGameRating domain.GameRa
 		looser = currentGame.Team1
 	}
 
-	teamRating := erc.calculateTeamRating(previousGameRating.WinningTeamRating.Rating, previousGameRating.LoosingTeamRating.Rating, winner.Score, looser.Score)
+	previousWinnerRating := erc.calculateWinnerRating(winner, latestPlayerRatings)
+	previousLooserRating := erc.calculateWinnerRating(looser, latestPlayerRatings)
+
+	teamRating := erc.calculateTeamRating(previousWinnerRating, previousLooserRating, winner.Score, looser.Score)
 
 	winnerTeamRating := domain.TeamRating{
 		Rating:        teamRating,
-		PlayerRatings: erc.createPlayerRatings(winner, previousPlayerRatings, teamRating),
+		PlayerRatings: erc.createPlayerRatings(winner, latestPlayerRatings, teamRating),
 	}
 
 	looserTeamRating := domain.TeamRating{
 		Rating:        -teamRating,
-		PlayerRatings: erc.createPlayerRatings(looser, previousPlayerRatings, -teamRating),
+		PlayerRatings: erc.createPlayerRatings(looser, latestPlayerRatings, -teamRating),
 	}
 
 	return domain.GameRating{
@@ -51,22 +54,40 @@ func (erc *EloRatingCalculator) CalculateRating(previousGameRating domain.GameRa
 	}
 }
 
-func (erc *EloRatingCalculator) createPlayerRatings(gameTeam domain.GameTeam, previousPlayerRatings []domain.PlayerRating, teamRating float64) []domain.PlayerRating {
+func (erc *EloRatingCalculator) calculateWinnerRating(team domain.GameTeam, latestPlayerRatings map[int64]domain.PlayerRating) float64 {
+	totalRating := float64(0)
+
+	for _, playerId := range team.Players {
+		previousPlayerRating, found := latestPlayerRatings[playerId]
+		if !found {
+			previousPlayerRating = domain.PlayerRating{
+				PlayerID: playerId,
+				Rating:   erc.DefaultRating,
+			}
+			latestPlayerRatings[playerId] = previousPlayerRating
+		}
+
+		totalRating += previousPlayerRating.Rating
+	}
+
+	return totalRating / float64(len(team.Players))
+}
+
+func (erc *EloRatingCalculator) createPlayerRatings(gameTeam domain.GameTeam, latestPlayerRatings map[int64]domain.PlayerRating, teamRating float64) []domain.PlayerRating {
 	playerRatings := make([]domain.PlayerRating, len(gameTeam.Players))
 
 	ratingPerPlayer := teamRating / float64(len(gameTeam.Players))
 
 	for idx, playerId := range gameTeam.Players {
-		// Find previous rating
-		for _, previousPlayerRating := range previousPlayerRatings {
-			if previousPlayerRating.PlayerID == playerId {
-				playerRatings[idx] = domain.PlayerRating{
-					PlayerID: playerId,
-					Rating:   previousPlayerRating.Rating + ratingPerPlayer,
-				}
-				break
-			}
+		previousPlayerRating := latestPlayerRatings[playerId]
+
+		playerRating := domain.PlayerRating{
+			PlayerID: playerId,
+			Rating:   previousPlayerRating.Rating + ratingPerPlayer,
 		}
+
+		playerRatings[idx] = playerRating
+		latestPlayerRatings[playerId] = playerRating
 	}
 
 	return playerRatings

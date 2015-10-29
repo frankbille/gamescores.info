@@ -1,30 +1,47 @@
 <h1 class="md-display-1">{{league.name}}</h1>
 
-<section layout="column" ng-repeat="gameDate in gameDates" flex="50">
-    <h3 class="md-title" layout-padding>{{gameDate.date.format('YYYY-MM-DD')}}</h3>
+<div layout="row" flex>
+    <div layout="column" flex="50">
+        <h2>Games</h2>
 
-    <div layout="row" layout-padding ng-repeat="game in gameDate.games">
-        <div flex="35" layout="row" layout-align="start center" class="md-body-1">
-            <span ng-repeat="player in game.team1.players | orderBy:name">{{player.name}}{{$last ? '' : '&nbsp;+&nbsp;'}}</span>
-        </div>
-        <div flex="10" layout="row" layout-align="start center" class="md-body-2">vs.</div>
-        <div flex="35" layout="row" layout-align="start center" class="md-body-1">
-            <span ng-repeat="player in game.team2.players | orderBy:name">{{player.name}}{{$last ? '' : '&nbsp;+&nbsp;'}}</span>
-        </div>
-        <div flex="10" layout="row" layout-align="end center" class="md-body-2">
-            {{game.team1.score}}:{{game.team2.score}}
-        </div>
-        <div flex="10" layout="row" layout-align="center center">
-            <md-button aria-label="Edit game" class="md-icon-button" ng-show="game._links.update" ui-sref="games.edit({gameId:game.id})" ng-click="editGame(game.id)">
-                <md-icon md-svg-icon="editor:mode_edit"></md-icon>
+        <section layout="column" ng-repeat="gameDate in gameDates">
+            <h3 class="md-title" layout-padding>{{gameDate.date.format('YYYY-MM-DD')}}</h3>
+
+            <div layout="row" layout-padding ng-repeat="game in gameDate.games">
+                <div flex="35" layout="row" layout-align="start center" class="md-body-1">
+                    <span ng-repeat="player in game.team1.players | orderBy:name">{{player.name}}{{$last ? '' : '&nbsp;+&nbsp;'}}</span>
+                </div>
+                <div flex="10" layout="row" layout-align="start center" class="md-body-2">vs.</div>
+                <div flex="35" layout="row" layout-align="start center" class="md-body-1">
+                    <span ng-repeat="player in game.team2.players | orderBy:name">{{player.name}}{{$last ? '' : '&nbsp;+&nbsp;'}}</span>
+                </div>
+                <div flex="10" layout="row" layout-align="end center" class="md-body-2">
+                    {{game.team1.score}}:{{game.team2.score}}
+                </div>
+                <div flex="10" layout="row" layout-align="center center">
+                    <md-button aria-label="Edit game" class="md-icon-button" ng-show="game._links.update"
+                               ui-sref="games.edit({gameId:game.id})" ng-click="editGame(game.id)">
+                        <md-icon md-svg-icon="editor:mode_edit"></md-icon>
+                    </md-button>
+                </div>
+            </div>
+        </section>
+
+        <div layout="column" layout-align="start center">
+            <md-progress-circular ng-show="loading" md-mode="indeterminate" md-diameter="32"></md-progress-circular>
+            <md-button class="md-raised md-primary" ng-click="loadMore()" ng-show="hasNextLink && !loading">
+                Load more games
             </md-button>
         </div>
     </div>
-</section>
 
-<div layout="column" flex="50" layout-align="start center">
-    <md-progress-circular ng-show="loading" md-mode="indeterminate" md-diameter="32"></md-progress-circular>
-    <md-button class="md-raised md-primary" ng-click="loadMore()" ng-show="hasNextLink && !loading">
-        Load more games
-    </md-button>
+    <div layout="column" flex="50">
+        <h2>Player ranking</h2>
+
+        <div layout="row" ng-repeat="playerRanking in playerRankings | orderBy:'position'">
+            <div flex="10">{{playerRanking.position}}</div>
+            <div flex="30">{{playerRanking.player.name}}</div>
+            <div flex="30" layout layout-align="end center">{{playerRanking.rating | number:0}}</div>
+        </div>
+    </div>
 </div>

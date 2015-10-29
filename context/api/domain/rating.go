@@ -17,13 +17,27 @@ type PlayerRating struct {
 }
 
 type LeagueResult struct {
-	LeagueID     int64                `json:"leagueId"`
-	PlayerResult []LeaguePlayerResult `json:"players"`
+	DefaultHalResource
+	LeagueID      int64               `json:"leagueId"`
+	PlayerResults LeaguePlayerResults `json:"players"`
+}
+
+type LeaguePlayerResults []LeaguePlayerResult
+
+func (lr LeaguePlayerResults) Len() int {
+	return len(lr)
+}
+
+func (lr LeaguePlayerResults) Less(i, j int) bool {
+	return lr[i].Rating > lr[j].Rating
+}
+
+func (lr LeaguePlayerResults) Swap(i, j int) {
+	lr[i], lr[j] = lr[j], lr[i]
 }
 
 type LeaguePlayerResult struct {
-	PlayerID   int64   `json:"playerId"`
-	PlayerName string  `json:"playerName"`
-	Position   int     `json:"position"`
-	Rating     float64 `json:"rating"`
+	Player   Player  `json:"player"`
+	Position int     `json:"position"`
+	Rating   float64 `json:"rating"`
 }

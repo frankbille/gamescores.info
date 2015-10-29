@@ -27,6 +27,18 @@ func (dao *GameDao) GetGames(start, limit int, leagueID int64) ([]domain.Game, i
 	return games, count, err
 }
 
+func (dao *GameDao) GetGamesForRating(leagueID int64) ([]domain.Game, error) {
+	var games []domain.Game
+
+	leagueKey := datastore.NewKey(dao.Context, EntityLeague, "", leagueID, nil)
+	_, err := dao.getListForAncestor(EntityGame, 0, 0, leagueKey, []string{
+		"GameDate",
+		"ID",
+	}, &games)
+
+	return games, err
+}
+
 func (dao *GameDao) GetGame(leagueID, gameID int64) (*domain.Game, error) {
 	var game domain.Game
 	leagueKey := datastore.NewKey(dao.Context, EntityLeague, "", leagueID, nil)

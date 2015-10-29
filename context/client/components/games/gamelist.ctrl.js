@@ -1,6 +1,10 @@
-angular.module('GameScoresApp').controller('GameListCtrl', function ($scope, GameService, LeagueService, $stateParams, $state) {
+angular.module('GameScoresApp').controller('GameListCtrl', function ($scope, GameService, RatingService, LeagueService, $stateParams, $state) {
     LeagueService.getLeague($stateParams.leagueId).then(function(league) {
        $scope.league = league;
+    });
+
+    RatingService.getLeagueResult($stateParams.leagueId).then(function(leagueResult) {
+        $scope.playerRankings = leagueResult.players;
     });
 
     $scope.gameDates = [];

@@ -129,6 +129,14 @@ func (gs GameService) doSaveGame(game domain.Game, c *gin.Context) {
 		c.AbortWithError(500, err)
 	}
 
+	ratingService := CreateRatingService()
+	err = ratingService.SaveRating(c, savedGame)
+
+	if err != nil {
+		utils.GetGaeContext(c).Errorf("Error saving rating: %v", err)
+		c.AbortWithError(500, err)
+	}
+
 	gs.addGameLinks(game.LeagueID, savedGame, c)
 	c.JSON(200, savedGame)
 }
