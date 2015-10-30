@@ -91,18 +91,20 @@ func (rs *RatingService) recreateLeagueResult(c *gin.Context, leagueId int64) er
 
 	leagueResult := domain.LeagueResult{
 		LeagueID:      leagueId,
-		PlayerResults: make([]domain.LeaguePlayerResult, len(leaguePlayerIds)),
+		PlayerResults: []domain.LeaguePlayerResult{},
 	}
 
-	for idx, playerId := range leaguePlayerIds {
-		latestPlayerRating := latestPlayerRatings[playerId]
+	for _, playerId := range leaguePlayerIds {
 		player := playerMap[playerId]
+		if player.Active {
+			latestPlayerRating := latestPlayerRatings[playerId]
 
-		addPlayerLinks(&player, c)
+			addPlayerLinks(&player, c)
 
-		leagueResult.PlayerResults[idx] = domain.LeaguePlayerResult{
-			Player: player,
-			Rating: latestPlayerRating.Rating,
+			leagueResult.PlayerResults = append(leagueResult.PlayerResults, domain.LeaguePlayerResult{
+				Player: player,
+				Rating: latestPlayerRating.Rating,
+			})
 		}
 	}
 

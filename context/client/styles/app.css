@@ -2,3 +2,17 @@
 a.md-fab md-icon, a.md-icon-button md-icon {
     height: auto;
 }
+
+section:first-of-type .game-date {
+    margin-top: 0;
+}
+
+.game-date {
+    margin-bottom: 0;
+    padding-top: 0;
+}
+
+.game-result div {
+    padding-top: 0;
+    padding-bottom: 0;
+}
