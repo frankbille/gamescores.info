@@ -3,7 +3,11 @@ angular.module('GameScoresApp').factory('GameService', function ($http, PlayerSe
     var replacePlayerWithObject = function (playerIdList, playerMap) {
         var newPlayerList = [];
         angular.forEach(playerIdList, function (playerId) {
-            newPlayerList.push(playerMap[playerId]);
+            var player = playerMap[playerId];
+            // Clone player to have unique references for each use. This means we can
+            // modify the player object per game
+            player = JSON.parse(JSON.stringify(player));
+            newPlayerList.push(player);
         });
         return newPlayerList;
     };

@@ -61,13 +61,14 @@ func (erc *EloRatingCalculator) calculateWinnerRating(team domain.GameTeam, late
 		previousPlayerRating, found := latestPlayerRatings[playerId]
 		if !found {
 			previousPlayerRating = domain.PlayerRating{
-				PlayerID: playerId,
-				Rating:   erc.DefaultRating,
+				PlayerID:  playerId,
+				OldRating: erc.DefaultRating,
+				NewRating: erc.DefaultRating,
 			}
 			latestPlayerRatings[playerId] = previousPlayerRating
 		}
 
-		totalRating += previousPlayerRating.Rating
+		totalRating += previousPlayerRating.NewRating
 	}
 
 	return totalRating / float64(len(team.Players))
@@ -81,13 +82,11 @@ func (erc *EloRatingCalculator) createPlayerRatings(gameTeam domain.GameTeam, la
 	for idx, playerId := range gameTeam.Players {
 		previousPlayerRating := latestPlayerRatings[playerId]
 
-		playerRating := domain.PlayerRating{
-			PlayerID: playerId,
-			Rating:   previousPlayerRating.Rating + ratingPerPlayer,
-		}
+		previousPlayerRating.OldRating = previousPlayerRating.NewRating
+		previousPlayerRating.NewRating = previousPlayerRating.OldRating + ratingPerPlayer
 
-		playerRatings[idx] = playerRating
-		latestPlayerRatings[playerId] = playerRating
+		playerRatings[idx] = previousPlayerRating
+		latestPlayerRatings[playerId] = previousPlayerRating
 	}
 
 	return playerRatings

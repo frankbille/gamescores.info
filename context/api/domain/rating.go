@@ -2,8 +2,8 @@ package domain
 
 type GameRating struct {
 	GameID            int64      `json:"gameId"`
-	WinningTeamRating TeamRating `json:"winningTeamRating`
-	LoosingTeamRating TeamRating `json:"lossingTeamRating`
+	WinningTeamRating TeamRating `json:"winningTeamRating"`
+	LoosingTeamRating TeamRating `json:"loosingTeamRating"`
 }
 
 type TeamRating struct {
@@ -12,8 +12,9 @@ type TeamRating struct {
 }
 
 type PlayerRating struct {
-	PlayerID int64   `json:"playerId"`
-	Rating   float64 `json:"rating"`
+	PlayerID  int64   `json:"playerId"`
+	OldRating float64 `json:"oldrating"`
+	NewRating float64 `json:"newrating"`
 }
 
 type LeagueResult struct {

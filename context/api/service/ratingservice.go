@@ -7,7 +7,12 @@ import (
 	"api/utils"
 	"fmt"
 	"github.com/gamescores/gin"
+	"net/url"
 	"sort"
+)
+
+const (
+	relGameRatingList domain.RelType = "gameratinglist"
 )
 
 type RatingService struct {
@@ -103,7 +108,7 @@ func (rs *RatingService) recreateLeagueResult(c *gin.Context, leagueId int64) er
 
 			leagueResult.PlayerResults = append(leagueResult.PlayerResults, domain.LeaguePlayerResult{
 				Player: player,
-				Rating: latestPlayerRating.Rating,
+				Rating: latestPlayerRating.NewRating,
 			})
 		}
 	}
@@ -149,6 +154,8 @@ func (rs *RatingService) getRatingsGinService(c *gin.Context) {
 		gameIds[idx] = utils.ConvertToInt64(gameIdString)
 	}
 
+	utils.GetGaeContext(c).Infof("%#v", rs.gameRatings[leagueId])
+
 	ratings := rs.getRatings(leagueId, gameIds)
 
 	c.JSON(200, ratings)
@@ -181,4 +188,22 @@ func (rs *RatingService) getLeagueResult(c *gin.Context, leagueId int64) domain.
 	}
 
 	return leagueResult
+}
+
+func addGetGameRatingsByIDLinks(games *domain.Games, leagueId int64, c *gin.Context) {
+	gameRatingsListURL, err := url.Parse(fmt.Sprintf("/api/ratings/%d/games", leagueId))
+
+	if err != nil {
+		utils.GetGaeContext(c).Errorf("Error parsing URL: %v", err)
+		c.AbortWithError(500, err)
+		return
+	}
+
+	q := gameRatingsListURL.Query()
+	for _, game := range games.Games {
+		q.Add("gameId", fmt.Sprintf("%d", game.ID))
+	}
+	gameRatingsListURL.RawQuery = q.Encode()
+
+	games.AddLink(relGameRatingList, gameRatingsListURL.String())
 }

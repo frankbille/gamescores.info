@@ -16,3 +16,15 @@ section:first-of-type .game-date {
     padding-top: 0;
     padding-bottom: 0;
 }
+
+.positive-rating::before {
+    content: '+';
+}
+
+.positive-rating {
+    color: #009900;
+}
+
+.negative-rating {
+    color: #990000;
+}

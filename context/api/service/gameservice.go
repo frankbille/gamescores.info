@@ -165,6 +165,7 @@ func (gs GameService) addGamesLinks(games *domain.Games, leagueID int64, current
 		gs.addPlayerIdsFromGameTeam(playerIDSet, game.Team2)
 	}
 	addGetPlayerListByIDLinks(games, playerIDSet.Values(), c)
+	addGetGameRatingsByIDLinks(games, leagueID, c)
 }
 
 func (gs GameService) addPlayerIdsFromGameTeam(playerIDSet *utils.Int64Set, gameTeam domain.GameTeam) {
