@@ -9,18 +9,28 @@
 
             <div layout="row" class="game-result" ng-repeat="game in gameDate.games">
                 <div flex="35" layout-padding layout="row" layout-align="start center" class="md-body-1">
-                    <div ng-repeat="player in game.team1.players | orderBy:name">
-                        <span class="md-body-2">{{player.name}}{{$last ? '' : '&nbsp;+&nbsp;'}}</span><br>
-                        {{player.playerRating.newrating | number:0}}
-                        <span ng-class="{'positive-rating': player.playerRating.diff > 0, 'negative-rating': player.playerRating.diff < 0}">{{player.playerRating.diff | number:0}}</span>
+                    <div layout="row" ng-repeat="player in game.team1.players | orderBy:name">
+                        <div layout="column">
+                            <div class="md-body-2">{{player.name}}</div>
+                            <div>
+                                {{player.playerRating.newrating | number:0}}
+                                <span ng-class="{'positive-rating': player.playerRating.diff > 0, 'negative-rating': player.playerRating.diff < 0}">{{player.playerRating.diff | number:0}}</span>
+                            </div>
+                        </div>
+                        <div ng-if="!$last" layout="column" layout-padding class="md-body-2">+</div>
                     </div>
                 </div>
                 <div flex="10" layout-padding layout="row" layout-align="start center" class="md-body-2">vs.</div>
                 <div flex="35" layout-padding layout="row" layout-align="start center" class="md-body-1">
-                    <div ng-repeat="player in game.team2.players | orderBy:name">
-                        <span class="md-body-2">{{player.name}}{{$last ? '' : '&nbsp;+&nbsp;'}}</span><br>
-                        {{player.playerRating.newrating | number:0}}
-                        <span ng-class="{'positive-rating': player.playerRating.diff > 0, 'negative-rating': player.playerRating.diff < 0}">{{player.playerRating.diff | number:0}}</span>
+                    <div layout="row" ng-repeat="player in game.team2.players | orderBy:name">
+                        <div layout="column">
+                            <div class="md-body-2">{{player.name}}</div>
+                            <div>
+                                {{player.playerRating.newrating | number:0}}
+                                <span ng-class="{'positive-rating': player.playerRating.diff > 0, 'negative-rating': player.playerRating.diff < 0}">{{player.playerRating.diff | number:0}}</span>
+                            </div>
+                        </div>
+                        <div ng-if="!$last" layout="column" layout-padding class="md-body-2">+</div>
                     </div>
                 </div>
                 <div flex="10" layout-padding layout="row" layout-align="end center" class="md-body-2">
@@ -47,7 +57,7 @@
         <h2 layout-padding>Player ranking</h2>
 
         <md-progress-circular ng-hide="playerRankings" md-mode="indeterminate" md-diameter="32"></md-progress-circular>
-        <div layout-padding class="md-body-1" layout="row" ng-show="playerRankings" ng-repeat="playerRanking in playerRankings | orderBy:'position'">
+        <div layout-padding class="md-body-1" layout="row" ng-show="playerRankings" ng-repeat="playerRanking in playerRankings | orderBy:'position' | filter:{player:{active:true}}">
             <div flex="10" layout layout-align="start center">{{playerRanking.position}}</div>
             <div flex="60" layout layout-align="start center">{{playerRanking.player.name}}</div>
             <div flex="30" layout layout-align="end center">{{playerRanking.rating | number:0}}</div>

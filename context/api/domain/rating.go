@@ -20,7 +20,7 @@ type PlayerRating struct {
 type LeagueResult struct {
 	DefaultHalResource
 	LeagueID      int64               `json:"leagueId"`
-	PlayerResults LeaguePlayerResults `json:"players"`
+	PlayerResults LeaguePlayerResults `json:"players" datastore:"-"`
 }
 
 type LeaguePlayerResults []LeaguePlayerResult
@@ -38,7 +38,8 @@ func (lr LeaguePlayerResults) Swap(i, j int) {
 }
 
 type LeaguePlayerResult struct {
-	Player   Player  `json:"player"`
+	PlayerID int64   `json:"-"`
+	Player   Player  `json:"player" datastore:"-"`
 	Position int     `json:"position"`
 	Rating   float64 `json:"rating"`
 }

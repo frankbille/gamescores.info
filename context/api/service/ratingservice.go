@@ -16,16 +16,12 @@ const (
 )
 
 type RatingService struct {
-	gameRatings         map[int64]map[int64]domain.GameRating
-	leagueResults       map[int64]domain.LeagueResult
 	latestPlayerRatings map[int64]map[int64]domain.PlayerRating
 	defaultRatingType   rating.RatingType
 }
 
 func CreateRatingService() RatingService {
 	return RatingService{
-		gameRatings:         make(map[int64]map[int64]domain.GameRating),
-		leagueResults:       make(map[int64]domain.LeagueResult),
 		latestPlayerRatings: make(map[int64]map[int64]domain.PlayerRating),
 		defaultRatingType:   rating.RATING_ELO,
 	}
@@ -57,9 +53,7 @@ func (rs *RatingService) recalculateForLeagueGinService(c *gin.Context) {
 }
 
 func (rs *RatingService) recalculateForLeague(c *gin.Context, leagueId int64) error {
-	rs.gameRatings[leagueId] = make(map[int64]domain.GameRating)
 	rs.latestPlayerRatings[leagueId] = make(map[int64]domain.PlayerRating)
-	gameRatings := rs.gameRatings[leagueId]
 	latestPlayerRatings := rs.latestPlayerRatings[leagueId]
 
 	gameDao := dao.CreateGameDao(c)
@@ -70,12 +64,14 @@ func (rs *RatingService) recalculateForLeague(c *gin.Context, leagueId int64) er
 		return err
 	}
 
+	ratingDao := dao.CreateRatingDao(c)
+
 	ratingProvider := rating.RatingProviderFactory(rs.defaultRatingType)
 	ratingCalculator := ratingProvider.GetRatingCalculator()
 
 	for _, game := range games {
 		gameRating := ratingCalculator.CalculateRating(latestPlayerRatings, game)
-		gameRatings[game.ID] = gameRating
+		ratingDao.SaveGameRating(gameRating)
 	}
 
 	return rs.recreateLeagueResult(c, leagueId)
@@ -86,31 +82,18 @@ func (rs *RatingService) recreateLeagueResult(c *gin.Context, leagueId int64) er
 
 	leaguePlayerIds := rs.convertMapInt64KeysToArray(latestPlayerRatings)
 
-	playerDao := dao.CreatePlayerDao(c)
-	players, err := playerDao.GetAllPlayersByID(leaguePlayerIds)
-	playerMap := rs.convertPlayerArrayToPlayerMap(players)
-
-	if err != nil {
-		return err
-	}
-
 	leagueResult := domain.LeagueResult{
 		LeagueID:      leagueId,
 		PlayerResults: []domain.LeaguePlayerResult{},
 	}
 
 	for _, playerId := range leaguePlayerIds {
-		player := playerMap[playerId]
-		if player.Active {
-			latestPlayerRating := latestPlayerRatings[playerId]
+		latestPlayerRating := latestPlayerRatings[playerId]
 
-			addPlayerLinks(&player, c)
-
-			leagueResult.PlayerResults = append(leagueResult.PlayerResults, domain.LeaguePlayerResult{
-				Player: player,
-				Rating: latestPlayerRating.NewRating,
-			})
-		}
+		leagueResult.PlayerResults = append(leagueResult.PlayerResults, domain.LeaguePlayerResult{
+			PlayerID: playerId,
+			Rating:   latestPlayerRating.NewRating,
+		})
 	}
 
 	sort.Sort(leagueResult.PlayerResults)
@@ -120,11 +103,8 @@ func (rs *RatingService) recreateLeagueResult(c *gin.Context, leagueId int64) er
 		leaguePlayerResult.Position = idx + 1
 	}
 
-	leagueResult.AddLink(domain.RelSelf, fmt.Sprintf("/api/ratings/%d/result", leagueId))
-
-	rs.leagueResults[leagueId] = leagueResult
-
-	return nil
+	ratingDao := dao.CreateRatingDao(c)
+	return ratingDao.SaveLeagueResult(leagueResult)
 }
 
 func (rs *RatingService) convertMapInt64KeysToArray(dataMap map[int64]domain.PlayerRating) []int64 {
@@ -154,40 +134,66 @@ func (rs *RatingService) getRatingsGinService(c *gin.Context) {
 		gameIds[idx] = utils.ConvertToInt64(gameIdString)
 	}
 
-	utils.GetGaeContext(c).Infof("%#v", rs.gameRatings[leagueId])
+	ratings, err := rs.getRatings(c, leagueId, gameIds)
 
-	ratings := rs.getRatings(leagueId, gameIds)
+	if err != nil {
+		utils.GetGaeContext(c).Errorf("Error getting ratings: %v", err)
+		c.AbortWithError(500, err)
+		return
+	}
 
 	c.JSON(200, ratings)
 }
 
-func (rs *RatingService) getRatings(leagueId int64, gameIds []int64) []domain.GameRating {
-	ratings := make([]domain.GameRating, len(gameIds))
+func (rs *RatingService) getRatings(c *gin.Context, leagueId int64, gameIds []int64) ([]domain.GameRating, error) {
+	ratingDao := dao.CreateRatingDao(c)
 
-	for idx, gameId := range gameIds {
-		ratings[idx] = rs.gameRatings[leagueId][gameId]
-	}
-
-	return ratings
+	return ratingDao.GetGameRatings(gameIds)
 }
 
 func (rs *RatingService) getLeagueResultGinService(c *gin.Context) {
 	leagueId := utils.ConvertToInt64(c.Param("leagueId"))
 
-	leagueResult := rs.getLeagueResult(c, leagueId)
+	leagueResult, err := rs.getLeagueResult(c, leagueId)
+
+	if err != nil {
+		utils.GetGaeContext(c).Errorf("Error getting league result: %v", err)
+		c.AbortWithError(500, err)
+		return
+	}
+
+	leagueResult.AddLink(domain.RelSelf, fmt.Sprintf("/api/ratings/%d/result", leagueId))
 
 	c.JSON(200, leagueResult)
 }
 
-func (rs *RatingService) getLeagueResult(c *gin.Context, leagueId int64) domain.LeagueResult {
-	leagueResult, found := rs.leagueResults[leagueId]
+func (rs *RatingService) getLeagueResult(c *gin.Context, leagueId int64) (*domain.LeagueResult, error) {
+	ratingDao := dao.CreateRatingDao(c)
 
-	if !found {
-		rs.recalculateForLeague(c, leagueId)
-		leagueResult = rs.leagueResults[leagueId]
+	leagueResult, err := ratingDao.GetLeagueResult(leagueId)
+
+	if err != nil {
+		return nil, err
 	}
 
-	return leagueResult
+	playerDao := dao.CreatePlayerDao(c)
+
+	leaguePlayerIds := make([]int64, len(leagueResult.PlayerResults))
+	for idx, leaguePlayerResult := range leagueResult.PlayerResults {
+		leaguePlayerIds[idx] = leaguePlayerResult.PlayerID
+	}
+
+	players, err := playerDao.GetAllPlayersByID(leaguePlayerIds)
+	playerMap := rs.convertPlayerArrayToPlayerMap(players)
+
+	utils.GetGaeContext(c).Infof("%#v", playerMap)
+
+	for idx, _ := range leagueResult.PlayerResults {
+		leaguePlayerResult := &leagueResult.PlayerResults[idx]
+		leaguePlayerResult.Player = playerMap[leaguePlayerResult.PlayerID]
+	}
+
+	return leagueResult, nil
 }
 
 func addGetGameRatingsByIDLinks(games *domain.Games, leagueId int64, c *gin.Context) {
