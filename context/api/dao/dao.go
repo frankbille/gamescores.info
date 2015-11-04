@@ -41,9 +41,12 @@ func (dao *dao) getList(entityType string, start, limit int, dataObjects interfa
 
 func (dao *dao) getListForAncestor(entityType string, start, limit int, ancestor *datastore.Key, orderByFields []string, dataObjects interface{}) (int, error) {
 	q := datastore.NewQuery(entityType).
-		Ancestor(ancestor).
-		Offset(start).
-		Limit(limit)
+		Ancestor(ancestor)
+
+	if limit > 0 {
+		q = q.Offset(start).
+			Limit(limit)
+	}
 
 	if orderByFields != nil {
 		for _, orderByField := range orderByFields {

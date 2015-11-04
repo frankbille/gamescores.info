@@ -14,6 +14,12 @@ indexes:
   ancestor: yes
   properties:
   - name: GameDate
+  - name: ID
+
+- kind: Game
+  ancestor: yes
+  properties:
+  - name: GameDate
     direction: desc
 
 - kind: Game
